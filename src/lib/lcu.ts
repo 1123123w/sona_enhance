@@ -99,6 +99,54 @@ function del<T = unknown>(endpoint: string): Promise<T> {
   return request<T>(endpoint, { method: 'DELETE' })
 }
 
+// ==================== SGP Server ID 映射 ====================
+
+/**
+ * platformId / issuer 子域名 → SGP_SERVERS key 的映射表
+ *
+ * 解决 platformId 与 SGP_SERVERS key 不一致的问题：
+ * - EUW1 (platformId) → EUW (SGP_SERVERS key)
+ * - RU1 → RU
+ * - NA → NA1 (命令行 --region 可能不含数字)
+ *
+ * 参考 LeagueAkari 的 region/rsoPlatformId 与 SGP_SERVERS 配置对比
+ * @see resources/builtin-config/sgp/league-servers.json
+ */
+const PLATFORM_ID_TO_SGP_KEY: Record<string, string> = {
+  // 外服 platformId 含数字后缀但 SGP_SERVERS key 不含
+  EUW1: 'EUW',
+  EUN1: 'EUN1', // 不在 SGP_SERVERS 中，但保留映射
+  RU1: 'RU',
+  // 命令行 --region 可能不含数字但 SGP_SERVERS key 含数字
+  NA: 'NA1',
+  OCE: 'OC1',
+  // 以下 platformId 与 SGP_SERVERS key 一致，但显式列出以防遗漏
+  BR1: 'BR1',
+  JP1: 'JP1',
+  KR: 'KR',
+  LA1: 'LA1',
+  LA2: 'LA2',
+  OC1: 'OC1',
+  TR1: 'TR1',
+  TW2: 'TW2',
+  SG2: 'SG2',
+  PH2: 'PH2',
+  VN2: 'VN2',
+  TH2: 'TH2',
+  PBE: 'PBE',
+}
+
+/** 国服 platformId 集合（需要加 TENCENT_ 前缀） */
+const TENCENT_PLATFORM_IDS = new Set([
+  'HN1', 'HN2', 'HN3', 'HN4', 'HN5', 'HN6', 'HN7', 'HN8', 'HN9',
+  'HN10', 'HN11', 'HN12', 'HN13', 'HN14', 'HN15', 'HN16', 'HN17', 'HN18', 'HN19',
+  'WT1', 'WT2', 'WT3', 'WT4', 'WT5', 'WT6', 'WT7',
+  'EDU1',
+  'BGP1', 'BGP2',
+  'NJ100', 'GZ100', 'CQ100', 'TJ100', 'TJ101',
+  'PBE', 'PREPBE',
+])
+
 // ==================== LCUManager 类 ====================
 
 type EventCallback = (message: LCUEventMessage) => void
@@ -715,35 +763,84 @@ class LCUManager {
   /**
    * 从 Entitlements Token 的 issuer 推断当前 SGP 服务器 ID
    *
-   * 优先使用缓存的 token，避免每次都发请求。
-   * 国服 issuer 格式：`http://hn1-k8s-bcs-internal.lol.qq.com:28088`
-   *   → 提取 `hn1` → 映射为 `TENCENT_HN1`
+   * 解析策略（多源 fallback）：
+   * 1. 国服 issuer：匹配 `lol.qq.com` 域名，提取服务器代码，加 `TENCENT_` 前缀
+   * 2. 外服 issuer：匹配 `sgp.pvp.net` / `pvp.net` 域名，通过映射表转为 SGP key
+   * 3. Fallback：使用 `/lol-chat/v1/me` 的 `platformId` + 映射表
    *
-   * 外服 issuer 格式：`https://euw1-red.lol.sgp.pvp.net`
-   *   → 提取 `euw1` → 映射为 `EUW`
-   *
-   * 如果解析失败返回空字符串
+   * 已知问题（对比 LeagueAkari）：
+   * - LeagueAkari 从 LeagueClient.exe 命令行参数 `--region` / `--rso_platform_id` 获取，
+   *   这是官方数据源，最可靠。但 Pengu Loader 插件无法访问命令行参数。
+   * - 国服部分大区 issuer 不含 `k8s`（如联盟一区 NJ100），旧正则会匹配失败。
+   * - 外服 issuer 子域名可能与 SGP_SERVERS key 不一致（如 EUW1 → EUW）。
    */
   async getSgpServerId(): Promise<string> {
-    const tokenRes = this._entitlementsToken ?? await this.getEntitlementsToken()
+    // 尝试从 issuer 解析
+    const fromIssuer = this._parseSgpServerIdFromIssuer()
+    if (fromIssuer) return fromIssuer
+
+    // Fallback: 从 /lol-chat/v1/me 的 platformId 解析
+    const fromPlatformId = await this._parseSgpServerIdFromPlatformId()
+    if (fromPlatformId) return fromPlatformId
+
+    return ''
+  }
+
+  /** 从 issuer URL 解析 SGP 服务器 ID */
+  private _parseSgpServerIdFromIssuer(): string {
+    const tokenRes = this._entitlementsToken
+    if (!tokenRes) return ''
+
     const issuer = tokenRes.issuer ?? ''
 
-    // 国服格式: http://hn1-k8s-bcs-internal.lol.qq.com:28088
-    // 提取子域名部分
-    const tencentMatch = issuer.match(/https?:\/\/([a-z0-9]+)-k8s-bcs-internal\.lol\.qq\.com/)
+    // 国服: 匹配 lol.qq.com 域名下的 issuer
+    // 已知格式：
+    //   http://hn1-k8s-bcs-internal.lol.qq.com:28088  (含 k8s)
+    //   http://nj100-bcs-internal.lol.qq.com:28088     (不含 k8s)
+    // 提取第一个子域名段（即服务器代码），忽略中间的 -k8s 等段
+    const tencentMatch = issuer.match(/https?:\/\/([a-z0-9]+)(?:-[a-z0-9]+)*\.lol\.qq\.com/)
     if (tencentMatch) {
-      const serverCode = tencentMatch[1].toUpperCase() // e.g. "HN1"
+      const serverCode = tencentMatch[1].toUpperCase() // e.g. "HN1", "NJ100"
       return `TENCENT_${serverCode}`
     }
 
-    // 外服格式: https://euw1-red.lol.sgp.pvp.net
-    // 简单提取第一个子域名段
-    const externalMatch = issuer.match(/https?:\/\/([a-z0-9]+)-/)
+    // 外服: 匹配 pvp.net 域名
+    // 已知格式：
+    //   https://euw1-red.lol.sgp.pvp.net
+    //   https://euw-red.lol.sgp.pvp.net
+    //   https://na-red.lol.sgp.pvp.net
+    //   https://kr-red.lol.sgp.pvp.net
+    const externalMatch = issuer.match(/https?:\/\/([a-z0-9]+)-[a-z0-9]+\.lol\.sgp\.pvp\.net/)
+      ?? issuer.match(/https?:\/\/([a-z0-9]+)-[a-z0-9]+\.(?:lol\.)?sgp\.pvp\.net/)
+      ?? issuer.match(/https?:\/\/([a-z0-9]+)-/)
     if (externalMatch) {
-      return externalMatch[1].toUpperCase()
+      const rawCode = externalMatch[1].toUpperCase()
+      // issuer 子域名可能与 SGP_SERVERS key 不一致，需要映射
+      return PLATFORM_ID_TO_SGP_KEY[rawCode] ?? rawCode
     }
 
     return ''
+  }
+
+  /** 从 /lol-chat/v1/me 的 platformId 解析 SGP 服务器 ID（fallback） */
+  private async _parseSgpServerIdFromPlatformId(): Promise<string> {
+    try {
+      const me = await this.getChatMe()
+      const platformId = me.platformId?.toUpperCase() ?? ''
+      if (!platformId) return ''
+
+      // 国服 platformId: HN1, HN10, NJ100, TJ100 等
+      // 需要加 TENCENT_ 前缀
+      if (TENCENT_PLATFORM_IDS.has(platformId)) {
+        return `TENCENT_${platformId}`
+      }
+
+      // 外服 platformId: EUW1, NA1, KR, JP1 等
+      // 可能与 SGP_SERVERS key 不一致，需要映射
+      return PLATFORM_ID_TO_SGP_KEY[platformId] ?? platformId
+    } catch {
+      return ''
+    }
   }
 
   /**
