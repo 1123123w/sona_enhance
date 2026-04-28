@@ -17,6 +17,7 @@ import sonaIcon from '../../assets/Champie_Sona_profileicon.png'
 import { lcu, LcuEventUri, type LCUEventMessage } from '@/lib/lcu'
 import type { Availability, ChatMe } from '@/lib/lcu'
 import { sleep } from '@/lib/utils'
+import { getPuuid } from '@/lib/assets'
 
 /** 通用标记：标识已被 Sona 接管的 DOM 元素，防止重复绑定 */
 const HIJACKED_ATTR = 'data-sona-hijacked'
@@ -91,6 +92,22 @@ const AVAILABILITY_OPTIONS: { value: Availability; label: string }[] = [
 /** 当前状态缓存（从 store 初始化） */
 let currentAvailability: Availability = store.get('availability') as Availability
 
+/** 获取当前账号保存的签名 */
+function getSavedStatus(): string {
+  return store.get('statusMessage')[getPuuid()] ?? ''
+}
+
+/** 保存当前账号的签名 */
+function setSavedStatus(msg: string) {
+  const map = { ...store.get('statusMessage') }
+  if (msg) {
+    map[getPuuid()] = msg
+  } else {
+    delete map[getPuuid()]
+  }
+  store.set('statusMessage', map)
+}
+
 /**
  * 启动时恢复持久化的在线状态和签名
  *
@@ -116,7 +133,7 @@ async function restoreAvailabilityAndStatus() {
 
     const me = await lcu.getChatMe()
     const savedAvailability = store.get('availability') as Availability
-    const savedStatus = store.get('statusMessage')
+    const savedStatus = getSavedStatus()
 
     logger.info(
       '[Availability] 当前状态快照: client.availability=%s, client.statusMessage=%s | saved.availability=%s, saved.statusMessage=%s',
@@ -152,7 +169,7 @@ async function restoreAvailabilityAndStatus() {
       }
     } else if (clientStatus !== '') {
       if (clientStatus !== savedStatus) {
-        store.set('statusMessage', clientStatus)
+        setSavedStatus(clientStatus)
         logger.info('[Availability] 客户端签名与 store 不一致，已回写到 store: %s', clientStatus)
       } else {
         logger.info('[Availability] statusMessage 无需恢复（客户端与 store 一致）')
@@ -194,7 +211,7 @@ async function verifyAfterSubscribe() {
 
     const me = await lcu.getChatMe()
     const savedAvailability = store.get('availability') as Availability
-    const savedStatus = store.get('statusMessage')
+    const savedStatus = getSavedStatus()
 
     const clientStatus = hasContent(me.statusMessage) ? (me.statusMessage as string) : ''
 
@@ -260,9 +277,12 @@ function subscribeChatMeSync() {
 
     // 同步签名：只有"有效字符串"（非空、非 null、非其他类型）才写 store，
     // 避免客户端偶尔推送 null/undefined/'' 时覆盖掉已有的有效签名
-    if (hasContent(me.statusMessage) && store.get('statusMessage') !== me.statusMessage) {
-      store.set('statusMessage', me.statusMessage)
-      logger.info('[Availability] 签名变化 → 已持久化: %s', me.statusMessage)
+    if (hasContent(me.statusMessage)) {
+      const savedStatus = getSavedStatus()
+      if (me.statusMessage !== savedStatus) {
+        setSavedStatus(me.statusMessage as string)
+        logger.info('[Availability] 签名变化 → 已持久化: %s', me.statusMessage)
+      }
     }
 
     // 同步在线状态（菜单点击那条路已经写过一次 store，这里是兜底：比如玩家在别的插件/

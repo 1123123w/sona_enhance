@@ -6,6 +6,18 @@
 
 ---
 
+## [1.2.0] - 2026-04-28
+
+### ✨ 改进
+
+- **自定义签名按账号独立** — 签名数据改为以 puuid 为 key 存储，切换不同账号时各自保留自己的签名，互不影响。puuid 在插件加载时作为 asset 一次性获取，整个生命周期内不会变化
+
+### 🐛 Bug 修复
+
+- **英雄选择界面左侧队友平衡性提示无法显示** — 修复 `extractChampionIdFromWrapper` 在我方队员区域提取不到 championId 的问题：客户端 DOM 中 `.champion-icon-container` 自身不含 `background-image`，图标实际在子元素 `.portrait-icon` 上；改为在子元素中查找含 `champion-icons` 的 `background-image`
+
+---
+
 ## [1.1.2] - 2026-04-26
 
 ### 🐛 Bug 修复

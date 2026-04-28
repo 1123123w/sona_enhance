@@ -41,8 +41,8 @@ export interface SonaConfig {
   sidebarCollapsed: boolean
   /** 在线状态 */
   availability: string
-  /** 自定义签名 */
-  statusMessage: string
+  /** 自定义签名（按 puuid 独立存储，切换账号互不影响） */
+  statusMessage: Record<string, string>
   /** 面板快捷键 */
   hotkey: string
   /** 窗口视觉特效 */
@@ -116,7 +116,7 @@ const DEFAULT_CONFIG: SonaConfig = {
   benchNoCooldown: false,
   sidebarCollapsed: false,
   availability: 'chat',
-  statusMessage: '',
+  statusMessage: {},
   hotkey: 'F1',
   windowEffect: 'none',
   champSelectAssist: false,
