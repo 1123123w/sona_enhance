@@ -298,6 +298,15 @@ export interface ChatFriend {
   lol: LolSubStatus
 }
 
+/** POST /lol-spectator/v1/spectate/launch 的请求体 */
+export interface SpectatorLaunchPayload {
+  allowObserveMode: 'ALL' | 'FRIENDS' | 'NONE' | (string & {})
+  dropInSpectateGameId: string
+  gameQueueType: string
+  puuid: string
+  spectatorKey?: string
+}
+
 // ==================== 匹配相关 ====================
 
 

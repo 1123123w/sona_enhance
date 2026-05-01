@@ -29,6 +29,7 @@ import type {
   LCUEventMessage,
   MatchHistoryResponse,
   ChatFriend,
+  SpectatorLaunchPayload,
   SummonerSpellData,
   ChampionSummaryData,
   GameQueue,
@@ -36,7 +37,7 @@ import type {
 import type { SgpEntitlementsToken } from '@/types/sgp'
 
 // Re-export types for convenience
-export type { SummonerInfo, LobbyConfig, Lobby, GameflowPhase, GameflowSession, LCUEventMessage, ChatConversation, ChatMessage, ChatMe, Availability, SendChatMessageBody, ReadyCheck, ChampSelectSession, ChampSelectPlayerDetail, MatchHistoryResponse, ChatFriend }
+export type { SummonerInfo, LobbyConfig, Lobby, GameflowPhase, GameflowSession, LCUEventMessage, ChatConversation, ChatMessage, ChatMe, Availability, SendChatMessageBody, ReadyCheck, ChampSelectSession, ChampSelectPlayerDetail, MatchHistoryResponse, ChatFriend, SpectatorLaunchPayload }
 export type { SgpEntitlementsToken, SgpMatchHistoryLol } from '@/types/sgp'
 export { SGP_SERVERS, TENCENT_MATCH_HISTORY_INTEROP, TENCENT_SERVER_NAMES, queueIdToTag } from '@/types/sgp'
 
@@ -325,6 +326,47 @@ class LCUManager {
   /** 通过 gameName + tagLine (Riot ID) 获取召唤师信息 */
   getSummonerByRiotId(gameName: string, tagLine: string): Promise<SummonerInfo> {
     return get<SummonerInfo>(`/lol-summoner/v1/alias/lookup?gameName=${encodeURIComponent(gameName)}&tagLine=${encodeURIComponent(tagLine)}`)
+  }
+
+  /** 生成基础观战 payload；好友 presence 中有 spectatorKey 时应优先补上。 */
+  createSpectatorLaunchPayload(puuid: string, overrides: Partial<SpectatorLaunchPayload> = {}): SpectatorLaunchPayload {
+    return {
+      allowObserveMode: 'ALL',
+      dropInSpectateGameId: '',
+      gameQueueType: '',
+      puuid,
+      ...overrides,
+    }
+  }
+
+  /**
+   * 从好友 presence 中拼出观战 payload。
+   *
+   * spectatorKey 就在 `/lol-chat/v1/friends` 返回的 friend.lol.spectatorKey 里；
+   * 这个 key 只对正在游戏且允许观战的好友有值。
+   */
+  async getSpectatorLaunchPayloadByPuuid(puuid: string): Promise<SpectatorLaunchPayload | null> {
+    const friends = await this.getFriends()
+    const target = friends.find((friend) => friend.puuid.toLowerCase() === puuid.toLowerCase())
+    if (!target?.lol?.spectatorKey) return null
+
+    return this.createSpectatorLaunchPayload(target.puuid, {
+      gameQueueType: target.lol.gameQueueType || target.lol.gameMode || '',
+      spectatorKey: target.lol.spectatorKey,
+    })
+  }
+
+  /**
+   * 观战指定玩家。
+   *
+   * Akari 的 LCU helper 只传 puuid；实际客户端在部分场景需要 spectatorKey，
+   * 可以传入完整 payload（从 getSpectatorLaunchPayloadByPuuid 获取）。
+   */
+  launchSpectator(payload: string | SpectatorLaunchPayload): Promise<unknown> {
+    return post(
+      '/lol-spectator/v1/spectate/launch',
+      typeof payload === 'string' ? this.createSpectatorLaunchPayload(payload) : payload,
+    )
   }
 
 
