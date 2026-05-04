@@ -234,7 +234,7 @@ function splitSummaryMetric(value: string): { label: string; metric: string; kin
   return {
     label,
     metric,
-    kind: getSummaryKind(label),
+    kind: getSummaryKind(value),
   }
 }
 
@@ -247,11 +247,7 @@ function getSummaryKind(value: string): SummaryKind {
   const text = value.toLowerCase()
   if (value.includes('胜率')) {
     const winRate = Number.parseFloat(value.replace(/[^\d.]/g, ''))
-    if (Number.isFinite(winRate)) {
-      if (winRate > 50) return 'win-high'
-      if (winRate < 50) return 'win-low'
-    }
-    return 'win-even'
+    return Number.isFinite(winRate) && winRate > 50 ? 'win-high' : 'win-low'
   }
   if (value.includes('登场')) return 'pick'
   if (text.includes('tier')) return 'tier'
@@ -259,7 +255,7 @@ function getSummaryKind(value: string): SummaryKind {
   return 'default'
 }
 
-function Section({ title, children, empty = false }: { title: string; children: ReactNode; empty?: boolean }) {
+function Section({ title, children, empty = false, emptyText = '暂无数据' }: { title: string; children: ReactNode; empty?: boolean; emptyText?: string }) {
   return (
     <section className="sobp-section">
       <h3 className="sobp-section-title">
@@ -267,7 +263,7 @@ function Section({ title, children, empty = false }: { title: string; children: 
         {title}
       </h3>
       <div className="sobp-section-card">
-        {empty ? <div className="sobp-empty">暂无数据</div> : children}
+        {empty ? <div className="sobp-empty">{emptyText}</div> : children}
       </div>
     </section>
   )
@@ -359,7 +355,7 @@ function RuneSection({ title, runes, championName }: { title: string; runes?: Op
   }
 
   return (
-    <Section title={title} empty={visibleRunes.length === 0}>
+    <Section title={title} empty={visibleRunes.length === 0} emptyText="不支持自定义符文">
       {visibleRunes.map((rune, index) => {
         const applyKey = `${index}-${rune.id}`
         const keystoneId = rune.primary_rune_ids[0] ?? 0
@@ -428,7 +424,7 @@ function AugmentSection({ title, groups }: { title: string; groups?: BuildRecomm
                       title={info?.name ?? String(augment.id)}
                       description={info?.description ?? ''}
                       subtitle={getAugmentRarityLabel(group.rarity)}
-                      size={30}
+                      size={28}
                       border={getAugmentBorder(info?.rarity)}
                     />
                     <div className="sobp-augment-info">

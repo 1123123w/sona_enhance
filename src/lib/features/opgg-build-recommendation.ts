@@ -30,6 +30,7 @@ import type { GameflowPhase } from '@/types/lcu'
 const TARGET_SELECTOR = '.toggle-ability-previews-button'
 const HIJACK_ATTR = 'data-sona-opgg-build-hijacked'
 const PANEL_ID = 'sona-opgg-build-panel'
+const DEFAULT_OPGG_TIER: OpggTier = 'master_plus'
 
 interface RecommendationCacheEntry {
   key: string
@@ -229,7 +230,7 @@ async function loadRecommendation(context: RecommendationContext): Promise<Build
   const mainChampion = await getChampionWithVersionFallback({
     id: context.championId,
     mode,
-    tier: mode === 'arena' ? 'all' : 'platinum_plus',
+    tier: mode === 'arena' ? 'all' : DEFAULT_OPGG_TIER,
     position,
   })
 
@@ -269,7 +270,7 @@ async function loadRecommendation(context: RecommendationContext): Promise<Build
     runePages: normal?.data.runes ?? [],
     augments: augmentGroups.map((group) => ({
       rarity: group.rarity,
-      items: group.augments.slice(0, 4).map((augment) => ({
+      items: group.augments.slice(0, 5).map((augment) => ({
         id: augment.id,
         pickRate: augment.pick_rate,
         averagePlace: augment.total_place / Math.max(augment.play, 1),
@@ -352,7 +353,7 @@ function getSummaryLines(champion: OpggChampion): string[] {
 
   const stats = champion.data.summary.average_stats
   return [
-    `胜率 ${(stats.win_rate * 100).toFixed(1)}%`,
+    `总体胜率 ${(stats.win_rate * 100).toFixed(1)}%`,
     `登场 ${(stats.pick_rate * 100).toFixed(1)}%`,
     `Tier ${stats.tier || '-'}`,
   ]

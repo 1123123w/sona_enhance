@@ -2,7 +2,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 72px);
+  max-height: calc(90vh - 72px);
   overflow: hidden;
   border: 1px solid rgb(200 170 110 / 55%);
   background: #010a13;
@@ -182,12 +182,14 @@
 
 .sobp-summary-card--win-high .sobp-summary-label,
 .sobp-summary-card--win-high .sobp-summary-value {
-  color: #21d07a;
+  color: #2df092;
+  text-shadow: 0 0 8px rgb(45 240 146 / 22%);
 }
 
 .sobp-summary-card--win-low .sobp-summary-label,
 .sobp-summary-card--win-low .sobp-summary-value {
-  color: #e84057;
+  color: #ff526d;
+  text-shadow: 0 0 8px rgb(255 82 109 / 22%);
 }
 
 .sobp-summary-card--win-even .sobp-summary-label,
@@ -656,16 +658,16 @@
 
 .sobp-augment-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
 }
 
 .sobp-augment {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 8px;
-  padding: 7px;
+  gap: 6px;
+  padding: 6px;
   border: 1px solid rgb(200 170 110 / 12%);
   border-radius: 3px;
   background: rgb(1 10 19 / 72%);
@@ -678,14 +680,15 @@
 .sobp-augment-name {
   overflow: hidden;
   color: #f0e6d2;
-  font-size: 11px;
+  font-size: 10.5px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .sobp-augment-meta {
   color: #7e7e7e;
-  font-size: 10px;
+  font-size: 9.5px;
+  white-space: nowrap;
 }
 
 .sobp-empty {
