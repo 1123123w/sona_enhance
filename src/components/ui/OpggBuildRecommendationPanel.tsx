@@ -23,6 +23,8 @@ import { lcu } from '@/lib/lcu'
 import { type OpggItemBuild, type OpggMode, type OpggPosition, type OpggRuneBuild } from '@/lib/opgg-api'
 import '@/styles/OpggBuildRecommendationPanel.css'
 
+const MAX_RECOMMENDATION_ROWS = 3
+
 export interface RecommendationContext {
   championId: number
   queueId: number
@@ -111,7 +113,7 @@ export function OpggBuildRecommendationPanel({
         <div className="sobp-grid">
           <ItemSection title="核心装备" builds={recommendation?.coreItems} itemLimit={3} />
           <RuneSection title="符文搭配" runes={recommendation?.runePages} championName={championName} />
-          <SpellSection title="召唤师技能" builds={recommendation?.summonerSpells} limit={2} />
+          <SpellSection title="召唤师技能" builds={recommendation?.summonerSpells} limit={MAX_RECOMMENDATION_ROWS} />
         </div>
 
         {showAugments && <AugmentSection title="海克斯推荐" groups={recommendation?.augments} />}
@@ -270,7 +272,7 @@ function Section({ title, children, empty = false, emptyText = '暂无数据' }:
 }
 
 function ItemSection({ title, builds, itemLimit }: { title: string; builds?: OpggItemBuild[]; itemLimit: number }) {
-  const visibleBuilds = builds?.slice(0, 4) ?? []
+  const visibleBuilds = builds?.slice(0, MAX_RECOMMENDATION_ROWS) ?? []
   const maxRate = getMaxPickRate(visibleBuilds, 0.15)
 
   return (
@@ -309,7 +311,7 @@ function SpellSection({ title, builds, limit }: { title: string; builds?: OpggIt
           <div className="sobp-row-main">
             <RankBadge rank={index + 1} />
             <div className="sobp-icons">
-              {build.ids.map((id) => {
+              {[...build.ids].reverse().map((id) => {
                 const spell = getSpellInfo(id)
                 return <BuildIcon key={id} src={spell.iconPath || getSpellIcon(id)} title={spell.name || getSpellName(id)} description={spell.description} size={32} />
               })}
@@ -323,7 +325,7 @@ function SpellSection({ title, builds, limit }: { title: string; builds?: OpggIt
 }
 
 function RuneSection({ title, runes, championName }: { title: string; runes?: OpggRuneBuild[]; championName: string }) {
-  const visibleRunes = runes?.slice(0, 2) ?? []
+  const visibleRunes = runes?.slice(0, MAX_RECOMMENDATION_ROWS) ?? []
   const maxRate = getMaxRunePickRate(visibleRunes, 0.15)
   const [applyingKey, setApplyingKey] = useState('')
   const [appliedKey, setAppliedKey] = useState('')
