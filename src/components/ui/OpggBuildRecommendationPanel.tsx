@@ -438,6 +438,11 @@ function RuneSection({ title, runes, championName }: { title: string; runes?: Op
         ],
       })
       setAppliedKey(key)
+      try {
+        await lcu.sendChampSelectMessage(`${championName} 符文已应用`, 'celebration')
+      } catch {
+        // 非选人阶段或聊天室未就绪时忽略
+      }
     } catch {
       setApplyErrorKey(key)
     } finally {
