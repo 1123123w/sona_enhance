@@ -412,7 +412,7 @@ async function upsertRecommendedItemSet(context: RecommendationContext, recommen
 }
 
 function syncRecommendedItemSetWhenReady(entry: RecommendationCacheEntry): void {
-  if (!store.get('opggBuildRecommendation')) return
+  if (!store.get('smartBuildRecommendation')) return
   if (!currentChampionLocked) return
 
   const syncKey = getManagedItemSetUid(entry.context)
@@ -421,7 +421,7 @@ function syncRecommendedItemSetWhenReady(entry: RecommendationCacheEntry): void 
   itemSetSyncInFlightKeys.add(syncKey)
   entry.promise
     .then(async (recommendation) => {
-      if (!recommendation || !store.get('opggBuildRecommendation')) return
+      if (!recommendation || !store.get('smartBuildRecommendation')) return
       if (!currentChampionLocked) return
       if (!isCurrentRecommendationContext(entry.context)) return
       if (lastAppliedItemSetKey === syncKey) return
@@ -464,7 +464,11 @@ async function refreshContext(session?: ChampSelectSession) {
     )
 
     if (currentContext.championId > 0) {
-      mount()
+      if (store.get('opggBuildRecommendation')) {
+        mount()
+      } else {
+        unmountPanel()
+      }
       const cacheEntry = ensureRecommendationPrefetch(currentContext)
       if (cacheEntry && currentChampionLocked) {
         syncRecommendedItemSetWhenReady(cacheEntry)
@@ -980,7 +984,7 @@ function mount() {
   }
 }
 
-function unmount(resetContext = true) {
+function unmountPanel() {
   if (injectRegistered) {
     injector.unregister(tryHijackAbilityPreviewPanel)
     injectRegistered = false
@@ -993,6 +997,11 @@ function unmount(resetContext = true) {
     el.style.cursor = ''
   }
   boundElements.length = 0
+  closePanel()
+}
+
+function unmount(resetContext = true) {
+  unmountPanel()
   if (resetContext) {
     currentContext = {
       championId: 0,
@@ -1005,7 +1014,6 @@ function unmount(resetContext = true) {
   currentChampionLocked = false
   lastAppliedItemSetKey = ''
   itemSetSyncInFlightKeys.clear()
-  closePanel()
 }
 
 export function updateOpggBuildRecommendation(enabled: boolean) {
@@ -1029,6 +1037,12 @@ export function updateOpggBuildRecommendation(enabled: boolean) {
     }).catch(() => { /* ignore */ })
 
     logger.info('[OPGG] 配装推荐接管已启用 ✓')
+  } else if (enabled && phaseUnsub) {
+    lcu.getGameflowPhase().then((phase) => {
+      if (phase === 'ChampSelect') {
+        refreshContext()
+      }
+    }).catch(() => { /* ignore */ })
   } else if (!enabled && phaseUnsub) {
     phaseUnsub()
     phaseUnsub = null

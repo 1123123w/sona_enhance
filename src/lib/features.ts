@@ -728,8 +728,12 @@ export function initFeatures() {
     updateChampSelectTierBadge(enabled)
   })
 
-  updateOpggBuildRecommendation(store.get('opggBuildRecommendation'))
-  store.onChange('opggBuildRecommendation', updateOpggBuildRecommendation)
+  const updateOpggLifecycle = () => {
+    updateOpggBuildRecommendation(store.get('opggBuildRecommendation') || store.get('smartBuildRecommendation'))
+  }
+  updateOpggLifecycle()
+  store.onChange('opggBuildRecommendation', updateOpggLifecycle)
+  store.onChange('smartBuildRecommendation', updateOpggLifecycle)
 
   updateGlobalParticle(store.get('globalParticle'))
   store.onChange('globalParticle', updateGlobalParticle)
