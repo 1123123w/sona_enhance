@@ -28,10 +28,10 @@
 3. 将构建产物放入 Pengu Loader 的插件目录。
 4. 启动英雄联盟客户端，在 Sona 面板的「工具」页开启需要的功能。
 
-本项目构建后会输出到本机 Pengu 插件目录：
+构建完成后，将生成的 `sona` 插件目录放入 Pengu Loader 的插件目录。
 
 ```text
-C:\Users\pierr\Documents\Codex\plugins\sona
+Pengu Loader plugins/sona
 ```
 
 ## 构建
