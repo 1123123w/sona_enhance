@@ -18,6 +18,8 @@ export interface CounterRecommendationModalProps {
   enemyChampionId: number
   enemyLane: string
   suggestions: CounterRecommendationItem[]
+  state: 'loading' | 'ready' | 'error'
+  message?: string
 }
 
 function getChampionName(championId: number): string {
@@ -39,6 +41,8 @@ export function CounterRecommendationModal({
   enemyChampionId,
   enemyLane,
   suggestions,
+  state,
+  message,
 }: CounterRecommendationModalProps) {
   const enemyName = enemyChampionId > 0 ? getChampionName(enemyChampionId) : '对方英雄'
 
@@ -56,8 +60,12 @@ export function CounterRecommendationModal({
         </header>
 
         <div className="scrm-list">
-          {suggestions.length === 0 ? (
-            <div className="scrm-empty">暂无可用推荐</div>
+          {state === 'loading' ? (
+            <div className="scrm-empty">正在加载 OP.GG counter 数据...</div>
+          ) : state === 'error' ? (
+            <div className="scrm-empty scrm-empty--warning">{message || 'OP.GG counter 数据请求失败'}</div>
+          ) : suggestions.length === 0 ? (
+            <div className="scrm-empty">{message || 'OP.GG 暂无该英雄的可用 counter 推荐'}</div>
           ) : suggestions.map((suggestion, index) => {
             const matchup = suggestion.matchups
               .filter((item) => item.enemyId === enemyChampionId)

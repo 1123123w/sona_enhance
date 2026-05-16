@@ -107,3 +107,7 @@
   color: #a09b8c;
   text-align: center;
 }
+
+.scrm-empty--warning {
+  color: #e98585;
+}

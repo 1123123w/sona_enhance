@@ -48,9 +48,10 @@ const SELECTABLE_OPGG_TIERS: OpggTier[] = [
 ]
 const MIN_COUNTER_PLAY = 100
 const MAX_COUNTERS_PER_ENEMY = 8
-const MAX_SUGGESTIONS = 5
+const MAX_SUGGESTIONS = 10
 const RANKED_QUEUE_IDS = new Set([420, 440])
 const COUNTER_CLICK_ATTR = 'data-sona-counter-click'
+type CounterDataState = 'loading' | 'ready' | 'error'
 
 let phaseUnsub: (() => void) | null = null
 let champSelectUnsub: (() => void) | null = null
@@ -61,6 +62,8 @@ let rankedSummaryCacheTier: OpggTier | null = null
 let lastSuggestionSignature = ''
 let currentSession: ChampSelectSession | null = null
 let suggestionsByEnemyId = new Map<number, CounterSuggestion[]>()
+let counterDataState: CounterDataState = 'loading'
+let counterDataMessage = ''
 let counterModalRoot: Root | null = null
 let counterModalContainer: HTMLDivElement | null = null
 const boundEnemyIcons: Array<{ el: HTMLElement; handler: EventListener }> = []
@@ -225,7 +228,10 @@ function buildSuggestionsByEnemy(session: ChampSelectSession, summary: OpggRanke
 
     const enemyStats = championsById.get(enemyId)
     const enemyPosition = getBestPosition(enemyStats, mapAssignedPosition(enemy.assignedPosition))
-    if (!enemyPosition) continue
+    if (!enemyPosition) {
+      result.set(enemyId, [])
+      continue
+    }
 
     const suggestions = [...enemyPosition.counters]
       .filter((counter) => counter.champion_id > 0 && counter.play >= MIN_COUNTER_PLAY && !unavailable.has(counter.champion_id))
@@ -246,6 +252,15 @@ function buildSuggestionsByEnemy(session: ChampSelectSession, summary: OpggRanke
   return result
 }
 
+function getCounterMessage(enemyChampionId: number, suggestions: CounterSuggestion[]): string {
+  if (counterDataState === 'loading') return ''
+  if (counterDataState === 'error') return counterDataMessage
+  if (suggestionsByEnemyId.has(enemyChampionId) && suggestions.length === 0) {
+    return 'OP.GG 没有该英雄/分路的 counter 数据，或可推荐英雄已被选择/禁用。'
+  }
+  return '尚未读取到该敌方英雄的 OP.GG counter 数据。'
+}
+
 function showCounterModal(enemyChampionId: number, enemyLane: string, suggestions: CounterSuggestion[]) {
   if (!counterModalContainer) {
     counterModalContainer = document.createElement('div')
@@ -262,6 +277,7 @@ function showCounterModal(enemyChampionId: number, enemyLane: string, suggestion
         enemyChampionId: 0,
         enemyLane: '',
         suggestions: [],
+        state: 'ready',
       }),
     )
   }
@@ -273,6 +289,8 @@ function showCounterModal(enemyChampionId: number, enemyLane: string, suggestion
       enemyChampionId,
       enemyLane,
       suggestions,
+      state: counterDataState,
+      message: getCounterMessage(enemyChampionId, suggestions),
     }),
   )
 }
@@ -299,7 +317,7 @@ function cleanupEnemyIconBindings() {
 }
 
 function tryBindEnemyCounterIcons(): boolean {
-  if (!currentSession || suggestionsByEnemyId.size === 0) return true
+  if (!currentSession) return true
 
   const wrappers = document.querySelectorAll('.party.visible .summoner-wrapper.visible.right')
   if (wrappers.length === 0) return false
@@ -310,8 +328,7 @@ function tryBindEnemyCounterIcons(): boolean {
 
     const enemy = currentSession?.theirTeam[index]
     const enemyChampionId = enemy ? getSelectedChampionId(enemy) : 0
-    const suggestions = suggestionsByEnemyId.get(enemyChampionId)
-    if (!enemy || enemyChampionId <= 0 || !suggestions || suggestions.length === 0) return
+    if (!enemy || enemyChampionId <= 0) return
 
     const laneLabel = getLaneLabel(mapAssignedPosition(enemy.assignedPosition))
     const handler = (event: Event) => {
@@ -320,6 +337,7 @@ function tryBindEnemyCounterIcons(): boolean {
 
       event.stopPropagation()
       event.preventDefault()
+      const suggestions = suggestionsByEnemyId.get(enemyChampionId) ?? []
       showCounterModal(enemyChampionId, laneLabel, suggestions)
     }
 
@@ -349,7 +367,14 @@ function unregisterCounterInjection() {
 }
 
 async function refreshCounterRecommendations(session: ChampSelectSession) {
-  if (!RANKED_QUEUE_IDS.has(session.queueId)) return
+  currentSession = session
+  if (!RANKED_QUEUE_IDS.has(session.queueId)) {
+    unregisterCounterInjection()
+    return
+  }
+
+  registerCounterInjection()
+  tryBindEnemyCounterIcons()
 
   const signature = getEnemySignature(session)
   if (!signature || signature === lastSuggestionSignature) return
@@ -358,17 +383,30 @@ async function refreshCounterRecommendations(session: ChampSelectSession) {
   const hasEnemyPick = session.theirTeam.some((player) => getSelectedChampionId(player) > 0)
   if (!hasEnemyPick) return
 
+  counterDataState = 'loading'
+  counterDataMessage = ''
+  suggestionsByEnemyId = new Map()
+  cleanupEnemyIconBindings()
+  registerCounterInjection()
+  tryBindEnemyCounterIcons()
+
   try {
     const summary = await ensureRankedSummary()
     const globalSuggestions = buildSuggestions(session, summary)
     suggestionsByEnemyId = buildSuggestionsByEnemy(session, summary)
-    if (globalSuggestions.length === 0 && suggestionsByEnemyId.size === 0) return
+    counterDataState = 'ready'
+    counterDataMessage = ''
 
     cleanupEnemyIconBindings()
     registerCounterInjection()
     tryBindEnemyCounterIcons()
     logger.info('[CounterPick] Counter 推荐已准备: enemies=%d, global=%d', suggestionsByEnemyId.size, globalSuggestions.length)
   } catch (err) {
+    counterDataState = 'error'
+    counterDataMessage = err instanceof Error ? err.message : String(err)
+    cleanupEnemyIconBindings()
+    registerCounterInjection()
+    tryBindEnemyCounterIcons()
     logger.warn('[CounterPick] 生成 counter 建议失败:', err)
   }
 }
@@ -377,7 +415,11 @@ function mount(session?: ChampSelectSession) {
   lastSuggestionSignature = ''
   currentSession = session ?? null
   suggestionsByEnemyId = new Map()
+  counterDataState = 'loading'
+  counterDataMessage = ''
   void ensureRankedSummary().catch((err) => {
+    counterDataState = 'error'
+    counterDataMessage = err instanceof Error ? err.message : String(err)
     logger.warn('[CounterPick] OP.GG counter 数据预取失败:', err)
   })
   if (session) void refreshCounterRecommendations(session)
@@ -387,6 +429,8 @@ function unmount() {
   lastSuggestionSignature = ''
   currentSession = null
   suggestionsByEnemyId = new Map()
+  counterDataState = 'loading'
+  counterDataMessage = ''
   unregisterCounterInjection()
   cleanupCounterModal()
 }
