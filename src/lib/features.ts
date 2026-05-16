@@ -29,6 +29,7 @@ import { updateAutoReturnToLobby } from '@/lib/features/auto-return-to-lobby'
 import { updateOpggBuildRecommendation } from '@/lib/features/opgg-build-recommendation'
 import { preloadChampSelectTierBadgeData, updateChampSelectTierBadge } from '@/lib/features/champselect-tier-badge'
 import { setAvailabilityHijackEnabled, setHideTFTEnabled, setHideRightNavTextEnabled } from '@/lib/injections'
+import { calculateSonaPlayerStrengthScore, type SonaPlayerStrengthScore } from '@/lib/player-strength-score'
 
 // ==================== 共享：查询队友胜率 ====================
 
@@ -47,6 +48,14 @@ interface TeammateStats {
   avgD: number
   avgA: number
   kdaNum: number
+  strengthScore: SonaPlayerStrengthScore | null
+}
+
+interface TeamStatsResult {
+  isBlue: boolean
+  stats: TeammateStats[]
+  queueId: number
+  fetchCount: number
 }
 
 function getPlayerStatsKey(player: Pick<ChampSelectTeamPlayer, 'puuid' | 'summonerId' | 'cellId'>): string {
@@ -62,16 +71,16 @@ function getTeammateStatsKey(stat: TeammateStats): string {
 }
 
 /** 去重：同一个 ChampSelect 阶段多个功能需要同一份数据时，复用同一轮请求 */
-let _fetchTeamStatsPromise: Promise<{ isBlue: boolean; stats: TeammateStats[]; queueId: number }> | null = null
+let _fetchTeamStatsPromise: Promise<TeamStatsResult> | null = null
 
 /**
  * 查询当前选人阶段所有队友的近期战绩
  * 使用 SGP 接口 + tag 参数按当前游戏模式服务端过滤，拉 100 条
- * 返回 { isBlue, queueId, stats[] }
+ * 返回 { isBlue, queueId, stats[], fetchCount }
  *
  * 多次并发调用会复用同一轮请求（promise 去重）
  */
-async function fetchTeamStats(): Promise<{ isBlue: boolean; stats: TeammateStats[]; queueId: number }> {
+async function fetchTeamStats(): Promise<TeamStatsResult> {
   if (_fetchTeamStatsPromise) return _fetchTeamStatsPromise
 
   _fetchTeamStatsPromise = _doFetchTeamStats()
@@ -82,7 +91,7 @@ async function fetchTeamStats(): Promise<{ isBlue: boolean; stats: TeammateStats
   }
 }
 
-async function _doFetchTeamStats(): Promise<{ isBlue: boolean; stats: TeammateStats[]; queueId: number }> {
+async function _doFetchTeamStats(): Promise<TeamStatsResult> {
   const session = await lcu.getChampSelectSession()
   const localPlayer = session.myTeam.find((p) => p.cellId === session.localPlayerCellId)
   const isBlue = localPlayer ? localPlayer.cellId < 5 : true
@@ -114,6 +123,7 @@ async function _doFetchTeamStats(): Promise<{ isBlue: boolean; stats: TeammateSt
     avgD: 0,
     avgA: 0,
     kdaNum: 0,
+    strengthScore: null,
   })
 
   // 并行查询所有队友的战绩（不过滤，保留占位以对齐楼层索引）
@@ -163,6 +173,7 @@ async function _doFetchTeamStats(): Promise<{ isBlue: boolean; stats: TeammateSt
       }
 
       const total = matchStats.length
+      const strengthScore = calculateSonaPlayerStrengthScore(games, puuid)
       logger.info('[TeamStats] %s → SGP 拉取 %d 场 (tag=%s)', gameName, total, tag || '全部')
 
       return {
@@ -178,13 +189,14 @@ async function _doFetchTeamStats(): Promise<{ isBlue: boolean; stats: TeammateSt
         avgD: totalDeaths / total,
         avgA: totalAssists / total,
         kdaNum: totalDeaths === 0 ? totalKills + totalAssists : (totalKills + totalAssists) / totalDeaths,
+        strengthScore,
       } as TeammateStats
     } catch {
       return placeholder(player, i)
     }
   }))
 
-  return { isBlue, queueId: currentQueueId, stats }
+  return { isBlue, queueId: currentQueueId, stats, fetchCount: FETCH_COUNT }
 }
 
 // ==================== 选人阶段头像胜率特效 (champSelectAssist) ====================
@@ -293,6 +305,7 @@ function getCachedStatsForPlayer(player: ChampSelectTeamPlayer, floor: number): 
     avgD: 0,
     avgA: 0,
     kdaNum: 0,
+    strengthScore: null,
   }
 }
 
@@ -572,34 +585,51 @@ export function getRating(winRate: number, kda: number): string {
   return '☠️ 演员已就位'
 }
 
+const TEAM_POWER_TITLES = ['🦄 独角马', '🏇 上等马', '🐎 中等马', '🐴 下等马', '🐂 纯牛马'] as const
+
+function assignTeamPowerTitles(stats: TeammateStats[]): Map<string, string> {
+  const ranked = [...stats]
+    .filter((stat): stat is TeammateStats & { strengthScore: SonaPlayerStrengthScore } => Boolean(stat.strengthScore))
+    .sort((a, b) => b.strengthScore.score - a.strengthScore.score)
+
+  const titles = new Map<string, string>()
+  ranked.forEach((stat, index) => {
+    titles.set(getTeammateStatsKey(stat), TEAM_POWER_TITLES[Math.min(index, TEAM_POWER_TITLES.length - 1)])
+  })
+
+  return titles
+}
+
 async function analyzeTeammates() {
   try {
-    const { stats } = await fetchTeamStats()
+    const { stats, fetchCount } = await fetchTeamStats()
 
     logger.info('┌─── 队友战绩分析 ───')
 
-    const chatLines: string[] = ['Sona助手 ♫   队友卡池一览(本模式战绩):\n']
+    const chatLines: string[] = [`Sona助手 ♫   队友卡池一览(本模式近${fetchCount}场战绩):\n`]
+    const teamPowerTitles = assignTeamPowerTitles(stats)
 
     for (const s of stats) {
       const floor = `${s.floor}楼`
       if (s.winRate == null) {
         logger.info('│ %s — %s#%s — 无近期战绩或查询失败', floor, s.gameName, s.tagLine)
-        chatLines.push(`${floor}: 🆕 萌新上线 (无战绩)`)
+        chatLines.push(`${floor}: 🆕 萌新上线|胜率--|综合评分--`)
         continue
       }
 
       const winRate = s.winRate.toFixed(1)
       const kdaStr = s.kdaNum >= 99 ? 'Perfect' : s.kdaNum.toFixed(2)
-      const rating = getRating(s.winRate, s.kdaNum)
+      const title = teamPowerTitles.get(getTeammateStatsKey(s)) ?? '🆕 萌新上线'
+      const scoreText = s.strengthScore ? s.strengthScore.score.toFixed(1) : '--'
 
       logger.info(
-        '│ %s — %s#%s — 近%d场 胜率: %s%% (%d胜%d负) | KDA: %s (%.1f/%.1f/%.1f) | %s',
+        '│ %s — %s#%s — 近%d场 胜率: %s%% (%d胜%d负) | KDA: %s (%.1f/%.1f/%.1f) | 综合评分: %s | %s',
         floor, s.gameName, s.tagLine,
         s.total, winRate, s.wins, s.total - s.wins,
-        kdaStr, s.avgK, s.avgD, s.avgA, rating,
+        kdaStr, s.avgK, s.avgD, s.avgA, scoreText, title,
       )
 
-      chatLines.push(`${floor}: ${rating} | 胜率${winRate}% | KDA ${kdaStr}`)
+      chatLines.push(`${floor}: ${title}|胜率${winRate}%|KDA${kdaStr}|综合评分${scoreText}`)
     }
 
     logger.info('└────────────────────')
