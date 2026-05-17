@@ -22,7 +22,7 @@ export function Sidebar({ items, activeId, onSelect, collapsed, onToggle }: Side
       {/* Logo 区域 */}
       <div className="sona-sidebar-logo">
         <span className="sona-sidebar-logo-icon"><MusicIcon /></span>
-        {!collapsed && <span className="sona-sidebar-logo-text">Sona</span>}
+        {!collapsed && <span className="sona-sidebar-logo-text">Sona-E</span>}
       </div>
 
       {/* 导航项 */}

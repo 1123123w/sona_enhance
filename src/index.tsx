@@ -18,7 +18,7 @@ import '@/styles/index.css'
 import '@/styles/inject.css'
 import '@/styles/availabilityMenu.css'
 
-const PLUGIN_NAME = 'Sona'
+const PLUGIN_NAME = 'Sona-E'
 const PLUGIN_VERSION = __PLUGIN_VERSION__
 const CONTAINER_ID = 'sona-root'
 
@@ -145,7 +145,7 @@ function mountApp() {
   logger.info('Mounted ✓ (container connected: %s)', String(container.isConnected))
 
   if (!runtime.hasShownStartupToast) {
-    Toast.success('Sona 已启动 ♫')
+    Toast.success('Sona-E 已启动 ♫')
     runtime.hasShownStartupToast = true
   }
 

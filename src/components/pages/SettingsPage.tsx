@@ -16,14 +16,12 @@ const hotkeyOptions = [
 ]
 
 export function SettingsPage() {
-  const [developerMode, setDeveloperMode] = useState(store.get('developerMode'))
   const [hotkey, setHotkey] = useState(store.get('hotkey'))
   const [globalParticle, setGlobalParticle] = useState(store.get('globalParticle'))
   const [opggCacheStatus, setOpggCacheStatus] = useState('')
 
   useEffect(() => {
     const unsubs = [
-      store.onChange('developerMode', setDeveloperMode),
       store.onChange('hotkey', setHotkey),
       store.onChange('globalParticle', setGlobalParticle),
     ]
@@ -58,15 +56,6 @@ export function SettingsPage() {
 
 
       <SettingGroup title="高级选项">
-        <SettingCard
-          title="开发者模式"
-          description="启用调试面板，你最好知道你在做什么 ( ˘•ω•˘ )◞⚠"
-        >
-          <SonaSwitch
-            checked={developerMode}
-            onChange={(v) => { setDeveloperMode(v); store.set('developerMode', v) }}
-          />
-        </SettingCard>
         <SettingCard
           title="清空 OP.GG 缓存"
           description="清除本地保存的 OP.GG 推荐出装、英雄 T 级和 Counter 数据；下次使用时会重新请求。"

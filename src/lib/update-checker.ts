@@ -26,9 +26,9 @@ export interface UpdateState {
   error: string
 }
 
-const RELEASE_PAGE_URL = 'https://com.hytale.net.cn/WJZ-P/sona/releases'
-const GITHUB_API_LATEST = 'https://api.github.com/repos/WJZ-P/sona/releases/latest'
-const GITHUB_API_RELEASES = 'https://api.github.com/repos/WJZ-P/sona/releases'
+const RELEASE_PAGE_URL = 'https://github.com/1123123w/sona/releases'
+const GITHUB_API_LATEST = 'https://api.github.com/repos/1123123w/sona/releases/latest'
+const GITHUB_API_RELEASES = 'https://api.github.com/repos/1123123w/sona/releases'
 
 function wrapCorsProxy(targetUrl: string): string {
   return `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`
@@ -152,7 +152,7 @@ export function checkForUpdates(): Promise<UpdateState> {
         info: {
           currentVersion,
           latestVersion,
-          releaseName: release.name || `Sona v${latestVersion}`,
+          releaseName: release.name || `Sona-E v${latestVersion}`,
           releaseUrl: release.html_url || RELEASE_PAGE_URL,
           releaseBody: release.body || '该版本没有填写更新说明。',
           publishedAt: release.published_at || '',
@@ -182,8 +182,8 @@ function notifyUpdateAvailable(currentVersion: string, latestVersion: string) {
   notifiedVersion = latestVersion
 
   void lcu.sendNotification(
-    '检测到 Sona 新版本',
-    `${currentVersion} → ${latestVersion}，打开 Sona 面板查看更新内容。`,
+    '检测到 Sona-E 新版本',
+    `${currentVersion} → ${latestVersion}，打开 Sona-E 面板查看更新内容。`,
   ).catch((err) => {
     notifiedVersion = ''
     logger.warn('[Update] 发送更新通知失败:', err)

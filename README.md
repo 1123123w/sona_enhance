@@ -1,6 +1,6 @@
-# Sona 自用增强版
+# Sona-E 自用增强版
 
-这是基于 [WJZ-P/sona](https://github.com/WJZ-P/sona) 维护的个人自用 fork。
+这是基于 [WJZ-P/sona](https://github.com/WJZ-P/sona) 维护的个人自用 fork，当前公开仓库为 [1123123w/sona](https://github.com/1123123w/sona)。
 
 目标不是替代原项目，而是在持续吸收原版实用功能的基础上，保留一些更适合国服环境和个人使用习惯的改动。后续同步原版时优先吸收功能思路，不直接照搬原版文案、设置位置、默认值或 README。
 
@@ -17,7 +17,7 @@
 
 1. 安装并启用 Pengu Loader。
 2. 构建本项目后，将生成的插件目录放入 Pengu 插件目录。
-3. 在 Sona 工具页按需开启功能。
+3. 在 Sona-E 工具页按需开启功能。
 
 常用开关建议：
 
@@ -47,6 +47,7 @@
 ## 上游项目
 
 - 原项目：[WJZ-P/sona](https://github.com/WJZ-P/sona)
+- 原作者：感谢 [WJZ-P](https://github.com/WJZ-P) 创建和维护 Sona。
 - 本 fork 保留原项目的基础能力和许可证要求。原作者新增功能会定期评估并按自用需求吸收。
 
 ## License

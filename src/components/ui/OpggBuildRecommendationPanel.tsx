@@ -484,11 +484,11 @@ function RuneSection({ title, runes, championName, modeLabel }: { title: string;
     setApplyErrorKey('')
 
     try {
-      const pageName = `${championName} ${modeLabel} - Sona`
+      const pageName = `${championName} ${modeLabel} - Sona-E`
       await applyOpggRunePage(rune, pageName)
       setAppliedKey(key)
       try {
-        await lcu.sendChampSelectMessage(`${championName} ${modeLabel} 符文已应用 - Sona`, 'celebration')
+        await lcu.sendChampSelectMessage(`${championName} ${modeLabel} 符文已应用 - Sona-E`, 'celebration')
       } catch {
         // 非选人阶段或聊天室未就绪时忽略
       }

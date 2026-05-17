@@ -32,6 +32,41 @@
   text-shadow: 0 0 8px rgba(200, 170, 110, 0.2);
 }
 
+.sona-tool-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -12px 0 18px;
+  padding: 10px 0 12px;
+  background: linear-gradient(180deg, rgba(1, 10, 19, 0.96), rgba(1, 10, 19, 0.82));
+  backdrop-filter: blur(10px);
+}
+
+.sona-tool-nav button {
+  padding: 6px 10px;
+  border: 1px solid rgba(200, 170, 110, 0.18);
+  border-radius: 4px;
+  background: rgba(30, 35, 40, 0.56);
+  color: #c8aa6e;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.sona-tool-nav button:hover {
+  border-color: rgba(200, 170, 110, 0.42);
+  background: rgba(70, 55, 30, 0.44);
+  color: #f0e6d2;
+}
+
+.sona-tool-section {
+  scroll-margin-top: 58px;
+}
+
 /* ---- 调试页按钮行 ---- */
 .sona-debug-actions {
   display: flex;

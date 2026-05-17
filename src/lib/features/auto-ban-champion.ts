@@ -8,7 +8,7 @@ import { getChampionById } from '@/lib/assets'
 async function notifyAutoBanSuccess(championId: number) {
   const champInfo = getChampionById(championId)
   const champName = champInfo?.name || `英雄#${championId}`
-  const msg = `Sona助手 ♫   自动 Ban: ${champName}`
+  const msg = `Sona-E助手 ♫   自动 Ban: ${champName}`
 
   try {
     await lcu.sendChampSelectMessage(msg, 'celebration')

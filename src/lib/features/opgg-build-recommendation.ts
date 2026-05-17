@@ -37,7 +37,7 @@ const TARGET_SELECTOR = '.toggle-ability-previews-button'
 const HIJACK_ATTR = 'data-sona-opgg-build-hijacked'
 const PANEL_ID = 'sona-opgg-build-panel'
 const DEFAULT_OPGG_TIER: OpggTier = 'master_plus'
-const SONA_ITEM_SET_TITLE_PREFIX = '[Sona]'
+const SONA_ITEM_SET_TITLE_PREFIX = '[Sona-E]'
 const HEALTH_POTION_ID = 2003
 const ITEM_SET_ASSOCIATED_MAPS = [11, 12, 30]
 const RUNE_PAGES_EVENT_URI = '/lol-perks/v1/pages'
@@ -415,7 +415,7 @@ function getContextModeLabel(context: RecommendationContext): string {
 }
 
 function getSmartRunePageName(context: RecommendationContext): string {
-  return `${getChampionName(context.championId)} ${getModeLabel(resolveOpggMode(context), context)} - Sona`
+  return `${getChampionName(context.championId)} ${getModeLabel(resolveOpggMode(context), context)} - Sona-E`
 }
 
 function createManagedItemSet(context: RecommendationContext, recommendation: BuildRecommendation): ItemSet | null {
@@ -529,7 +529,7 @@ async function upsertRecommendedItemSet(context: RecommendationContext, recommen
 
   logger.info('[OPGG] 自动装备集已同步：%s，blocks=%d', nextItemSet.title, nextItemSet.blocks.length)
   const championName = getChampionName(context.championId)
-  lcu.sendChampSelectMessage(`${championName} 出装已配备 - Sona`, 'celebration').catch((err) => {
+  lcu.sendChampSelectMessage(`${championName} 出装已配备 - Sona-E`, 'celebration').catch((err) => {
     logger.warn('[OPGG] 自动装备集聊天提示发送失败:', err)
   })
 }
@@ -610,7 +610,7 @@ function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
       }
 
       const championName = getChampionName(entry.context.championId)
-      const pageName = `${championName} ${getContextModeLabel(entry.context)} - Sona`
+      const pageName = `${championName} ${getContextModeLabel(entry.context)} - Sona-E`
       await applyOpggRunePage(rune, pageName)
       lastAppliedRuneKey = syncKey
       logger.info('[OPGG] 自动符文已应用：%s', championName)
@@ -695,7 +695,7 @@ async function applySavedSmartLoadout(context: RecommendationContext): Promise<v
     ? '符文 & 召唤师技能'
     : runeRestored ? '符文' : '召唤师技能'
 
-  lcu.sendChampSelectMessage(`${championName} ${modeLabel} ${restoredText}已恢复 - Sona`, 'celebration').catch((err) => {
+  lcu.sendChampSelectMessage(`${championName} ${modeLabel} ${restoredText}已恢复 - Sona-E`, 'celebration').catch((err) => {
     logger.warn('[OPGG] 智能配置聊天提示发送失败:', err)
   })
 }

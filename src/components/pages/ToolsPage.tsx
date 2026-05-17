@@ -4,7 +4,6 @@ import { SonaButton } from '@/components/ui/SonaButton'
 import { SonaInput } from '@/components/ui/SonaInput'
 import { SonaSwitch } from '@/components/ui/SonaSwitch'
 import { SonaSelect } from '@/components/ui/SonaSelect'
-import { MatchHistoryModal } from '@/components/ui/MatchHistoryModal'
 import { searchChampions, getChampionById, type ChampionInfo } from '@/lib/assets'
 import { lcu } from '@/lib/lcu'
 import { logger } from '@/index'
@@ -19,6 +18,21 @@ const effectOptions = [
   { value: 'mica', label: '云母 (Win11)' },
   { value: 'transparent', label: '透明' },
 ]
+
+const toolSections = [
+  { id: 'champ-select', label: '选人增强' },
+  { id: 'opgg', label: 'OP.GG 推荐' },
+  { id: 'automation', label: '对局自动化' },
+  { id: 'social', label: '组队/好友' },
+  { id: 'interface', label: '客户端界面' },
+  { id: 'rank', label: '段位伪装' },
+  { id: 'replay', label: '回放' },
+  { id: 'backup', label: '设置备份' },
+]
+
+function scrollToToolSection(id: string) {
+  document.getElementById(`tool-section-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 function BackupManager() {
   const [backupName, setBackupName] = useState('')
@@ -194,11 +208,6 @@ export function ToolsPage() {
   const banChampSuggestRef = useRef<HTMLDivElement>(null)
   const [replayGameId, setReplayGameId] = useState('')
   const [replayState, setReplayState] = useState<'idle' | 'downloading' | 'ready' | 'launching' | 'error'>('idle')
-  const [searchRiotId, setSearchRiotId] = useState('')
-  const [searchError, setSearchError] = useState('')
-  const [matchModalOpen, setMatchModalOpen] = useState(false)
-  const [matchModalPuuid, setMatchModalPuuid] = useState('')
-  const [matchModalName, setMatchModalName] = useState('')
 
   useEffect(() => {
     const unsubs = [
@@ -271,27 +280,6 @@ export function ToolsPage() {
     }
   }
 
-  const handleSearchMatch = async () => {
-    const parts = searchRiotId.trim().split('#')
-    if (parts.length !== 2 || !parts[0] || !parts[1]) {
-      setSearchError('格式错误，请输入: 名字#Tag')
-      return
-    }
-    setSearchError('')
-    try {
-      const summoner = await lcu.getSummonerByRiotId(parts[0], parts[1])
-      if (!summoner?.puuid) {
-        setSearchError('未找到该召唤师')
-        return
-      }
-      setMatchModalPuuid(summoner.puuid)
-      setMatchModalName(`${parts[0]}#${parts[1]}`)
-      setMatchModalOpen(true)
-    } catch {
-      setSearchError('查询失败，请检查名字和Tag是否正确')
-    }
-  }
-
   const addAutoLockChampion = (champion: ChampionInfo) => {
     if (autoLockChampionIds.includes(champion.id)) {
       setChampSearchText('')
@@ -338,31 +326,15 @@ export function ToolsPage() {
     <div className="sona-settings">
       <h2 className="sona-settings-title">工具</h2>
 
-      <SettingGroup title="战绩查询">
-        <p className="sona-subtitle" style={{ marginBottom: 10 }}>输入召唤师名#Tag 查询任意玩家的近期战绩。</p>
-        <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
-          <div style={{ flex: 1 }}>
-            <SonaInput
-              value={searchRiotId}
-              onChange={(v) => { setSearchRiotId(v); setSearchError('') }}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSearchMatch() }}
-              placeholder="名字#Tag (例:丨一疾风剑豪一丨#77772)"
-            />
-          </div>
-          <SonaButton variant="primary" onClick={handleSearchMatch}>
-            查询战绩
-          </SonaButton>
-        </div>
-        {searchError && <p className="sona-subtitle" style={{ color: '#e74c3c', marginTop: 6 }}>{searchError}</p>}
-      </SettingGroup>
+      <div className="sona-tool-nav">
+        {toolSections.map((section) => (
+          <button key={section.id} type="button" onClick={() => scrollToToolSection(section.id)}>
+            {section.label}
+          </button>
+        ))}
+      </div>
 
-      <MatchHistoryModal
-        open={matchModalOpen}
-        onClose={() => setMatchModalOpen(false)}
-        puuid={matchModalPuuid}
-        playerName={matchModalName}
-      />
-
+      <section id="tool-section-champ-select" className="sona-tool-section">
       <SettingGroup title="选人增强">
         <SettingCard
           title="自动接受对局"
@@ -480,7 +452,9 @@ export function ToolsPage() {
           />
         </SettingCard>
       </SettingGroup>
+      </section>
 
+      <section id="tool-section-opgg" className="sona-tool-section">
       <SettingGroup title="OP.GG 推荐">
         <SettingCard
           title="配装推荐面板"
@@ -519,7 +493,9 @@ export function ToolsPage() {
           />
         </SettingCard>
       </SettingGroup>
+      </section>
 
+      <section id="tool-section-automation" className="sona-tool-section">
       <SettingGroup title="对局自动化">
         <SettingCard
           title="平衡性调整buff提示"
@@ -693,7 +669,9 @@ export function ToolsPage() {
           </div>
         )}
       </SettingGroup>
+      </section>
 
+      <section id="tool-section-social" className="sona-tool-section">
       <SettingGroup title="组队/好友">
         <SettingCard
           title="解锁自定义签名"
@@ -811,7 +789,9 @@ export function ToolsPage() {
           />
         </SettingCard>
       </SettingGroup>
+      </section>
 
+      <section id="tool-section-interface" className="sona-tool-section">
       <SettingGroup title="客户端界面">
         <SettingCard
           title="隐藏首页云顶之弈"
@@ -844,7 +824,9 @@ export function ToolsPage() {
           </div>
         </SettingCard>
       </SettingGroup>
+      </section>
 
+      <section id="tool-section-rank" className="sona-tool-section">
       <SettingGroup title="段位伪装">
         <p className="sona-subtitle" style={{ marginBottom: 10 }}>伪装好友列表中显示的段位信息，仅影响聊天名片展示，不影响生涯页面。(好友可见)</p>
         <div className="sona-debug-actions" style={{ alignItems: 'center' }}>
@@ -907,7 +889,9 @@ export function ToolsPage() {
           </SonaButton>
         </div>
       </SettingGroup>
+      </section>
 
+      <section id="tool-section-replay" className="sona-tool-section">
       <SettingGroup title="回放">
         <p className="sona-subtitle" style={{ marginBottom: 10 }}>输入 Game ID 下载并观看对局回放。可从战绩面板复制 Game ID。</p>
         <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
@@ -990,11 +974,14 @@ export function ToolsPage() {
           </SonaButton>
         </div>
       </SettingGroup>
+      </section>
 
+      <section id="tool-section-backup" className="sona-tool-section">
       <SettingGroup title="设置备份">
         <p className="sona-subtitle" style={{ marginBottom: 10 }}>备份当前客户端设置（快捷键、界面布局等），支持多个命名存档。</p>
         <BackupManager />
       </SettingGroup>
+      </section>
     </div>
   )
 }

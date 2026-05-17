@@ -32,13 +32,13 @@ export function UpdatePage() {
       <h2 className="sona-update-title">
         {info ? (
           <>
-            检测到Sona新版本：
+            检测到 Sona-E 新版本：
             <span className="sona-update-title-version">{info.currentVersion}</span>
             <span className="sona-update-title-arrow">→</span>
             <span className="sona-update-title-version sona-update-title-version--latest">{info.latestVersion}</span>
           </>
         ) : (
-          '检测到Sona新版本'
+          '检测到 Sona-E 新版本'
         )}
       </h2>
 
@@ -54,7 +54,7 @@ export function UpdatePage() {
 
           <div className="sona-update-download">
             <h3>下载方式</h3>
-            <p>请到 Release 地址、群文件或夸克网盘下载新版 Sona。</p>
+            <p>请到 Release 地址、群文件或夸克网盘下载新版 Sona-E。</p>
             <div className="sona-update-actions">
               <SonaButton variant="primary" onClick={() => openUrl(info.releaseUrl || getReleasePageUrl())}>
                 打开 Release

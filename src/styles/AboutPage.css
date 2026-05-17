@@ -31,9 +31,17 @@
 }
 
 .sona-about-version {
+  padding: 0;
+  border: 0;
+  background: transparent;
   font-size: 13px;
   color: #785a28;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.sona-about-version:hover {
+  color: #c8aa6e;
 }
 
 .sona-about-desc {
@@ -173,6 +181,16 @@
   margin: 0;
   font-size: 13px;
   color: #a09b8c;
+  line-height: 1.7;
+}
+
+.sona-about-text a {
+  color: #c8aa6e;
+  text-decoration: none;
+}
+
+.sona-about-text a:hover {
+  text-decoration: underline;
 }
 
 .sona-about-quote {
