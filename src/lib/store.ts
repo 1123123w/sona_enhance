@@ -54,6 +54,27 @@ export interface SonaConfig {
   /** 锁定英雄后自动应用 OP.GG 推荐符文 */
   opggAutoApplyRunes: boolean
   champSelectCounterRecommendation: boolean
+  /** 智能配装（后续扩展符文、召唤师技能持久化） */
+  smartBuildRecommendation: boolean
+  /** 智能符文：按英雄与模式保存的用户符文页 */
+  smartRunePages: Record<string, {
+    primaryStyleId: number
+    subStyleId: number
+    selectedPerkIds: number[]
+    updatedAt: number
+  }>
+  /** 智能召唤师技能：按英雄与模式保存的技能组合 */
+  smartSummonerSpells: Record<string, {
+    spell1Id: number
+    spell2Id: number
+    updatedAt: number
+  }>
+  /** 游戏设置备份：按 puuid 保存多个命名备份 */
+  gameSettingsBackups: Record<string, Record<string, {
+    general?: unknown
+    input?: unknown
+    timestamp: number
+  }>>
   /** OP.GG 配装推荐段位过滤 */
   opggBuildRecommendationTier: string
   /** 分析友方战力（进入选人自动查战绩并发送到聊天框） */
@@ -74,8 +95,12 @@ export interface SonaConfig {
   globalParticle: boolean
   /** 好友智能分组（开黑好友用同样颜色的border-right展示） */
   friendSmartGroup: boolean
+  /** 增强游戏中好友状态（显示模式、英雄和实时对局时长） */
+  enhancedFriendGameStatus: boolean
   /** 自定义生涯背景 */
   customProfileBg: boolean
+  /** 无视他人生涯隐私（XHR 响应改写，需重启生效） */
+  ignoreProfilePrivacy: boolean
   /** 自定义挑战旗帜 */
   customBanner: boolean
   /** 自定义挑战旗帜选择（仅本地显示） */
@@ -102,10 +127,14 @@ export interface SonaConfig {
   rankDivision: string
   /** 秒抢英雄开关 */
   autoLockChampion: boolean
-  /** 秒抢目标英雄 ID */
-  autoLockChampionId: number
+  /** 秒抢目标英雄优先级队列 */
+  autoLockChampionIds: number[]
   /** 秒抢时是否直接锁定（false 则只选择不锁定） */
   autoLockInstant: boolean
+  /** 自动禁用英雄开关 */
+  autoBanChampion: boolean
+  /** 自动禁用目标英雄优先级队列 */
+  autoBanChampionIds: number[]
   /** 平衡性调整 buff 提示（游玩特定模式时悬停头像显示数值调整） */
   balanceBuffTooltip: boolean
   /** 国服解锁炫彩分页（生涯藏品页显示"炫彩"tab，需重启客户端） */
@@ -140,6 +169,10 @@ const DEFAULT_CONFIG: SonaConfig = {
   opggBuildRecommendation: false,
   opggAutoApplyRunes: false,
   champSelectCounterRecommendation: false,
+  smartBuildRecommendation: true,
+  smartRunePages: {},
+  smartSummonerSpells: {},
+  gameSettingsBackups: {},
   opggBuildRecommendationTier: 'emerald_plus',
   analyzeTeamPower: false,
   analyzeTeamPowerMsgType: 'celebration',
@@ -150,9 +183,11 @@ const DEFAULT_CONFIG: SonaConfig = {
   sideIndicatorMsgType: 'celebration',
   globalParticle: false,
   friendSmartGroup: false,
+  enhancedFriendGameStatus: true,
   hideTFT: false,
   hideRightNavText: false,
   customProfileBg: false,
+  ignoreProfilePrivacy: true,
   customBanner: false,
   customBannerSelection: null,
   autoHonor: false,
@@ -161,8 +196,10 @@ const DEFAULT_CONFIG: SonaConfig = {
   rankTier: 'CHALLENGER',
   rankDivision: 'I',
   autoLockChampion: false,
-  autoLockChampionId: 0,
+  autoLockChampionIds: [],
   autoLockInstant: true,
+  autoBanChampion: false,
+  autoBanChampionIds: [],
   balanceBuffTooltip: false,
   unlockChromas: true,
   champSelectQuitButton: false,

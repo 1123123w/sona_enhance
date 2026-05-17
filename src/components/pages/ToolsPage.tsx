@@ -97,6 +97,49 @@ function BackupManager() {
   )
 }
 
+function ChampionPriorityCards({
+  championIds,
+  emptyText,
+  onRemove,
+}: {
+  championIds: number[]
+  emptyText: string
+  onRemove: (championId: number) => void
+}) {
+  if (championIds.length === 0) {
+    return <p className="sona-subtitle" style={{ margin: 0 }}>{emptyText}</p>
+  }
+
+  return (
+    <div className="sona-champ-priority-list">
+      {championIds.map((championId, index) => {
+        const champion = getChampionById(championId)
+        return (
+          <div className="sona-champ-priority-card" key={championId}>
+            <span className="sona-champ-priority-index">{index + 1}</span>
+            <img
+              className="sona-champ-priority-icon"
+              src={`/lol-game-data/assets/v1/champion-icons/${championId}.png`}
+              alt=""
+            />
+            <span className="sona-champ-priority-name">
+              {champion ? `${champion.title} ${champion.name}` : `英雄#${championId}`}
+            </span>
+            <button
+              className="sona-champ-priority-remove"
+              type="button"
+              onClick={() => onRemove(championId)}
+              aria-label="移除"
+            >
+              ×
+            </button>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export function ToolsPage() {
   const [autoAccept, setAutoAccept] = useState(store.get('autoAcceptMatch'))
   // 延迟值在 UI 里用字符串存，避免"删到空 → 变 NaN"、"输到一半"等中间态被推回 store
@@ -113,6 +156,7 @@ export function ToolsPage() {
   const [opggBuildRecommendation, setOpggBuildRecommendation] = useState(store.get('opggBuildRecommendation'))
   const [opggAutoApplyRunes, setOpggAutoApplyRunes] = useState(store.get('opggAutoApplyRunes'))
   const [champSelectCounterRecommendation, setChampSelectCounterRecommendation] = useState(store.get('champSelectCounterRecommendation'))
+  const [smartBuildRecommendation, setSmartBuildRecommendation] = useState(store.get('smartBuildRecommendation'))
   const [balanceBuffTooltip, setBalanceBuffTooltip] = useState(store.get('balanceBuffTooltip'))
   const [champSelectQuitButton, setChampSelectQuitButton] = useState(store.get('champSelectQuitButton'))
   const [gameAnalysisPopup, setGameAnalysisPopup] = useState(store.get('gameAnalysisPopup'))
@@ -126,6 +170,7 @@ export function ToolsPage() {
   const [sideIndicator, setSideIndicator] = useState(store.get('sideIndicator'))
   const [sideIndicatorMsgType, setSideIndicatorMsgType] = useState(store.get('sideIndicatorMsgType'))
   const [friendSmartGroup, setFriendSmartGroup] = useState(store.get('friendSmartGroup'))
+  const [enhancedFriendGameStatus, setEnhancedFriendGameStatus] = useState(store.get('enhancedFriendGameStatus'))
   const [customProfileBg, setCustomProfileBg] = useState(store.get('customProfileBg'))
   const [customBanner, setCustomBanner] = useState(store.get('customBanner'))
   const [rankQueue, setRankQueue] = useState(store.get('rankQueue'))
@@ -133,18 +178,18 @@ export function ToolsPage() {
   const [rankDivision, setRankDivision] = useState(store.get('rankDivision'))
   const [autoHonor, setAutoHonor] = useState(store.get('autoHonor'))
   const [autoLockChampion, setAutoLockChampion] = useState(store.get('autoLockChampion'))
-  const [champSearchText, setChampSearchText] = useState(() => {
-    const savedId = store.get('autoLockChampionId')
-    if (savedId > 0) {
-      const c = getChampionById(savedId)
-      return c ? `${c.title} ${c.name}` : String(savedId)
-    }
-    return ''
-  })
+  const [autoLockChampionIds, setAutoLockChampionIds] = useState(store.get('autoLockChampionIds'))
+  const [champSearchText, setChampSearchText] = useState('')
   const [champSuggestions, setChampSuggestions] = useState<ChampionInfo[]>([])
   const [showChampSuggestions, setShowChampSuggestions] = useState(false)
   const [autoLockInstant, setAutoLockInstant] = useState(store.get('autoLockInstant'))
   const champSuggestRef = useRef<HTMLDivElement>(null)
+  const [autoBanChampion, setAutoBanChampion] = useState(store.get('autoBanChampion'))
+  const [autoBanChampionIds, setAutoBanChampionIds] = useState(store.get('autoBanChampionIds'))
+  const [banChampSearchText, setBanChampSearchText] = useState('')
+  const [banChampSuggestions, setBanChampSuggestions] = useState<ChampionInfo[]>([])
+  const [showBanChampSuggestions, setShowBanChampSuggestions] = useState(false)
+  const banChampSuggestRef = useRef<HTMLDivElement>(null)
   const [replayGameId, setReplayGameId] = useState('')
   const [replayState, setReplayState] = useState<'idle' | 'downloading' | 'ready' | 'launching' | 'error'>('idle')
   const [searchRiotId, setSearchRiotId] = useState('')
@@ -168,6 +213,7 @@ export function ToolsPage() {
       store.onChange('opggBuildRecommendation', setOpggBuildRecommendation),
       store.onChange('opggAutoApplyRunes', setOpggAutoApplyRunes),
       store.onChange('champSelectCounterRecommendation', setChampSelectCounterRecommendation),
+      store.onChange('smartBuildRecommendation', setSmartBuildRecommendation),
       store.onChange('balanceBuffTooltip', setBalanceBuffTooltip),
       store.onChange('champSelectQuitButton', setChampSelectQuitButton),
       store.onChange('gameAnalysisPopup', setGameAnalysisPopup),
@@ -179,10 +225,14 @@ export function ToolsPage() {
       store.onChange('gameAnalysisFetchCount', setGameAnalysisFetchCount),
       store.onChange('sideIndicator', setSideIndicator),
       store.onChange('friendSmartGroup', setFriendSmartGroup),
+      store.onChange('enhancedFriendGameStatus', setEnhancedFriendGameStatus),
       store.onChange('customProfileBg', setCustomProfileBg),
       store.onChange('customBanner', setCustomBanner),
       store.onChange('autoHonor', setAutoHonor),
       store.onChange('autoLockChampion', setAutoLockChampion),
+      store.onChange('autoLockChampionIds', setAutoLockChampionIds),
+      store.onChange('autoBanChampion', setAutoBanChampion),
+      store.onChange('autoBanChampionIds', setAutoBanChampionIds),
       store.onChange('rankQueue', setRankQueue),
       store.onChange('rankTier', setRankTier),
       store.onChange('rankDivision', setRankDivision),
@@ -195,6 +245,9 @@ export function ToolsPage() {
     const handler = (e: MouseEvent) => {
       if (champSuggestRef.current && !champSuggestRef.current.contains(e.target as Node)) {
         setShowChampSuggestions(false)
+      }
+      if (banChampSuggestRef.current && !banChampSuggestRef.current.contains(e.target as Node)) {
+        setShowBanChampSuggestions(false)
       }
     }
     document.addEventListener('mousedown', handler)
@@ -233,6 +286,48 @@ export function ToolsPage() {
     } catch {
       setSearchError('查询失败，请检查名字和Tag是否正确')
     }
+  }
+
+  const addAutoLockChampion = (champion: ChampionInfo) => {
+    if (autoLockChampionIds.includes(champion.id)) {
+      setChampSearchText('')
+      setShowChampSuggestions(false)
+      return
+    }
+
+    const next = [...autoLockChampionIds, champion.id]
+    setAutoLockChampionIds(next)
+    store.set('autoLockChampionIds', next)
+    setChampSearchText('')
+    setShowChampSuggestions(false)
+    logger.info('[AutoLock] 已加入目标英雄队列: %s %s (ID: %d)', champion.title, champion.name, champion.id)
+  }
+
+  const removeAutoLockChampion = (championId: number) => {
+    const next = autoLockChampionIds.filter((id) => id !== championId)
+    setAutoLockChampionIds(next)
+    store.set('autoLockChampionIds', next)
+  }
+
+  const addAutoBanChampion = (champion: ChampionInfo) => {
+    if (autoBanChampionIds.includes(champion.id)) {
+      setBanChampSearchText('')
+      setShowBanChampSuggestions(false)
+      return
+    }
+
+    const next = [...autoBanChampionIds, champion.id]
+    setAutoBanChampionIds(next)
+    store.set('autoBanChampionIds', next)
+    setBanChampSearchText('')
+    setShowBanChampSuggestions(false)
+    logger.info('[AutoBan] 已加入目标英雄队列: %s %s (ID: %d)', champion.title, champion.name, champion.id)
+  }
+
+  const removeAutoBanChampion = (championId: number) => {
+    const next = autoBanChampionIds.filter((id) => id !== championId)
+    setAutoBanChampionIds(next)
+    store.set('autoBanChampionIds', next)
   }
 
   return (
@@ -381,7 +476,7 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="配装推荐"
+          title="配装推荐面板"
           description="锁定英雄后，点击皮肤选择下方的按钮以打开当前英雄的 OP.GG 配装、符文和海克斯推荐。"
         >
           <SonaSwitch
@@ -405,6 +500,15 @@ export function ToolsPage() {
           <SonaSwitch
             checked={champSelectCounterRecommendation}
             onChange={(v) => { setChampSelectCounterRecommendation(v); store.set('champSelectCounterRecommendation', v) }}
+          />
+        </SettingCard>
+        <SettingCard
+          title="智能配装 & 符文 & 召唤师技能"
+          description="根据所选模式、英雄智能配装，并针对游戏模式和英雄智能保存符文、召唤师技能，再也不需要频繁手切符文和召唤师技能！"
+        >
+          <SonaSwitch
+            checked={smartBuildRecommendation}
+            onChange={(v) => { setSmartBuildRecommendation(v); store.set('smartBuildRecommendation', v) }}
           />
         </SettingCard>
         <SettingCard
@@ -500,12 +604,7 @@ export function ToolsPage() {
                         key={c.id}
                         className="sona-champ-suggest-item"
                         type="button"
-                        onClick={() => {
-                          setChampSearchText(`${c.title} ${c.name}`)
-                          store.set('autoLockChampionId', c.id)
-                          setShowChampSuggestions(false)
-                          logger.info('[AutoLock] 目标英雄已设置: %s %s (ID: %d)', c.title, c.name, c.id)
-                        }}
+                        onClick={() => addAutoLockChampion(c)}
                       >
                         <img className="sona-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
                         <span className="sona-champ-suggest-title">{c.title}</span>
@@ -515,8 +614,6 @@ export function ToolsPage() {
                   </div>
                 )}
               </div>
-            </div>
-            <div className="sona-debug-actions" style={{ gap: 8 }}>
               <SonaButton
                 variant={autoLockInstant ? 'primary' : undefined}
                 onClick={() => { setAutoLockInstant(true); store.set('autoLockInstant', true) }}
@@ -530,6 +627,59 @@ export function ToolsPage() {
                 仅预选{!autoLockInstant ? ' ✓' : ''}
               </SonaButton>
             </div>
+            <ChampionPriorityCards
+              championIds={autoLockChampionIds}
+              emptyText="还没有添加秒抢英雄，按优先级从左到右尝试。"
+              onRemove={removeAutoLockChampion}
+            />
+          </div>
+        )}
+        <SettingCard
+          title="自动 Ban 英雄"
+          description="进入有禁用阶段的模式时，轮到自己自动禁用指定英雄。匹配、大乱斗等无ban的不受影响。"
+        >
+          <SonaSwitch
+            checked={autoBanChampion}
+            onChange={(v) => { setAutoBanChampion(v); store.set('autoBanChampion', v) }}
+          />
+        </SettingCard>
+        {autoBanChampion && (
+          <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="sona-debug-actions" style={{ alignItems: 'flex-start', gap: 8 }}>
+              <div style={{ flex: 1, position: 'relative' }} ref={banChampSuggestRef}>
+                <SonaInput
+                  value={banChampSearchText}
+                  onChange={(v) => {
+                    setBanChampSearchText(v)
+                    const results = searchChampions(v)
+                    setBanChampSuggestions(results)
+                    setShowBanChampSuggestions(results.length > 0)
+                  }}
+                  placeholder="搜索要 Ban 的英雄 (如: 亚索 / Yasuo)"
+                />
+                {showBanChampSuggestions && (
+                  <div className="sona-champ-suggest">
+                    {banChampSuggestions.map((c) => (
+                      <button
+                        key={c.id}
+                        className="sona-champ-suggest-item"
+                        type="button"
+                        onClick={() => addAutoBanChampion(c)}
+                      >
+                        <img className="sona-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
+                        <span className="sona-champ-suggest-title">{c.title}</span>
+                        <span className="sona-champ-suggest-name">{c.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <ChampionPriorityCards
+              championIds={autoBanChampionIds}
+              emptyText="还没有添加自动 Ban 英雄，按优先级从左到右尝试。"
+              onRemove={removeAutoBanChampion}
+            />
           </div>
         )}
       </SettingGroup>
@@ -598,7 +748,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="自定义生涯背景"
-          description="增强修改生涯背景弹窗，可以选择任意皮肤作为生涯背景。"
+          description="增强修改生涯背景弹窗，可以选择任意皮肤作为生涯背景。(好友可见)"
         >
           <SonaSwitch
             checked={customProfileBg}
@@ -621,6 +771,15 @@ export function ToolsPage() {
           <SonaSwitch
             checked={friendSmartGroup}
             onChange={(v) => { setFriendSmartGroup(v); store.set('friendSmartGroup', v) }}
+          />
+        </SettingCard>
+        <SettingCard
+          title="增强游戏中好友状态"
+          description="好友游戏中时，在右侧好友列表显示游戏模式和实时对局时长。"
+        >
+          <SonaSwitch
+            checked={enhancedFriendGameStatus}
+            onChange={(v) => { setEnhancedFriendGameStatus(v); store.set('enhancedFriendGameStatus', v) }}
           />
         </SettingCard>
       </SettingGroup>
@@ -659,7 +818,7 @@ export function ToolsPage() {
       </SettingGroup>
 
       <SettingGroup title="段位伪装">
-        <p className="sona-subtitle" style={{ marginBottom: 10 }}>伪装好友列表中显示的段位信息，仅影响聊天名片展示，不影响生涯页面。</p>
+        <p className="sona-subtitle" style={{ marginBottom: 10 }}>伪装好友列表中显示的段位信息，仅影响聊天名片展示，不影响生涯页面。(好友可见)</p>
         <div className="sona-debug-actions" style={{ alignItems: 'center' }}>
           <div style={{ minWidth: 140 }}>
             <SonaSelect
