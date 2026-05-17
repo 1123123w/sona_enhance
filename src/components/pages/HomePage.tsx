@@ -5,6 +5,7 @@ import { SonaButton } from '@/components/ui/SonaButton'
 import { SonaInput } from '@/components/ui/SonaInput'
 import { MatchHistoryModal } from '@/components/ui/MatchHistoryModal'
 import { lcu } from '@/lib/lcu'
+import { logger } from '@/index'
 import sonaIcon from '@/../assets/Champie_Sona_profileicon.png'
 
 function ParticleCanvas() {
@@ -122,6 +123,8 @@ export function HomePage() {
   const [matchModalOpen, setMatchModalOpen] = useState(false)
   const [matchModalPuuid, setMatchModalPuuid] = useState('')
   const [matchModalName, setMatchModalName] = useState('')
+  const [replayGameId, setReplayGameId] = useState('')
+  const [replayState, setReplayState] = useState<'idle' | 'downloading' | 'ready' | 'launching' | 'error'>('idle')
 
   const handleSearchMatch = async () => {
     const parts = searchRiotId.trim().split('#')
@@ -142,6 +145,69 @@ export function HomePage() {
       setMatchModalOpen(true)
     } catch {
       setSearchError('查询失败，请检查名字和 Tag 是否正确')
+    }
+  }
+
+  const handleWatchReplay = async () => {
+    const id = Number(replayGameId)
+    if (!id) return
+
+    setReplayState('downloading')
+    try {
+      const metaRes = await fetch(`/lol-replays/v1/metadata/${id}`)
+      if (!metaRes.ok) {
+        logger.error('[Replay] 获取元数据失败:', metaRes.status)
+        setReplayState('error')
+        return
+      }
+      const meta = await metaRes.json() as { state: string; downloadProgress: number; gameId: number }
+
+      if (meta.state === 'watch') {
+        setReplayState('launching')
+        const res = await fetch(`/lol-replays/v1/rofls/${id}/watch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ componentType: 'replay', contextData: 'match-history' }),
+        })
+        setReplayState(res.ok ? 'ready' : 'error')
+        if (res.ok) logger.info('[Replay] 开始播放 #%d ✓', id)
+        else logger.error('[Replay] 播放失败:', await res.text())
+        return
+      }
+
+      if (meta.state !== 'downloading') {
+        await fetch(`/lol-replays/v1/rofls/${id}/download`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ componentType: 'replay', contextData: 'match-history' }),
+        })
+      }
+
+      for (let i = 0; i < 30; i++) {
+        await new Promise((r) => setTimeout(r, 2000))
+        const checkRes = await fetch(`/lol-replays/v1/metadata/${id}`)
+        if (!checkRes.ok) continue
+        const checkMeta = await checkRes.json() as { state: string; downloadProgress: number }
+        logger.info('[Replay] 下载中... %d%%', checkMeta.downloadProgress)
+
+        if (checkMeta.state === 'watch') {
+          setReplayState('launching')
+          const res = await fetch(`/lol-replays/v1/rofls/${id}/watch`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ componentType: 'replay', contextData: 'match-history' }),
+          })
+          setReplayState(res.ok ? 'ready' : 'error')
+          if (res.ok) logger.info('[Replay] 下载完成，开始播放 #%d ✓', id)
+          else logger.error('[Replay] 播放失败:', await res.text())
+          return
+        }
+      }
+      logger.warn('[Replay] 等待超时')
+      setReplayState('error')
+    } catch (err) {
+      logger.error('[Replay] 异常:', err)
+      setReplayState('error')
     }
   }
 
@@ -188,6 +254,23 @@ export function HomePage() {
           </SonaButton>
         </div>
         {searchError && <p className="sona-home-search-error">{searchError}</p>}
+      </section>
+
+      <section className="sona-home-search">
+        <p className="sona-home-search-title">回放</p>
+        <p className="sona-home-search-hint">输入 Game ID 下载并观看对局回放。可从战绩面板复制 Game ID。</p>
+        <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
+          <div style={{ flex: 1 }}>
+            <SonaInput
+              value={replayGameId}
+              onChange={(v) => { setReplayGameId(v); setReplayState('idle') }}
+              placeholder="输入 Game ID..."
+            />
+          </div>
+          <SonaButton onClick={handleWatchReplay}>
+            {{ idle: '观看回放', downloading: '下载中...', ready: '已启动', launching: '启动中...', error: '重试' }[replayState]}
+          </SonaButton>
+        </div>
       </section>
 
       <MatchHistoryModal
