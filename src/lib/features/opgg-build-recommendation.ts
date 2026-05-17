@@ -1181,6 +1181,7 @@ async function openRecommendationPanel(anchor: HTMLElement, contextOverride?: Re
 
   outsideCloseHandler = (event: MouseEvent) => {
     const target = event.target as Node
+    if (target instanceof Element && target.closest('[data-sona-counter-modal="true"]')) return
     if (!root.contains(target) && !anchor.contains(target)) {
       closePanel()
     }

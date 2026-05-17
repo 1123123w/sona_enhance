@@ -1,3 +1,24 @@
+.scrm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 19006;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(1, 10, 19, 0.5);
+  pointer-events: auto;
+}
+
+.scrm-panel {
+  position: relative;
+  width: min(620px, calc(100vw - 40px));
+  max-height: min(720px, calc(100vh - 48px));
+  overflow: auto;
+  border: 1px solid rgba(200, 170, 110, 0.58);
+  background: #010a13;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.62);
+}
+
 .scrm {
   position: relative;
   z-index: 1;
@@ -6,6 +27,26 @@
   background:
     radial-gradient(circle at 20% 0%, rgba(200, 170, 110, 0.12), transparent 34%),
     rgba(1, 10, 19, 0.88);
+}
+
+.scrm-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(200, 170, 110, 0.48);
+  background: rgba(9, 20, 40, 0.92);
+  color: #c8aa6e;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 26px;
+}
+
+.scrm-close:hover {
+  color: #f0e6d2;
+  border-color: #c8aa6e;
 }
 
 .scrm-header {

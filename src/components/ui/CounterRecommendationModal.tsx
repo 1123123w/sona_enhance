@@ -1,4 +1,5 @@
-import { Modal } from '@/components/ui/Modal'
+import { useEffect, type SyntheticEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { getChampionById } from '@/lib/assets'
 import '@/styles/CounterRecommendationModal.css'
 
@@ -44,11 +45,38 @@ export function CounterRecommendationModal({
   state,
   message,
 }: CounterRecommendationModalProps) {
+  useEffect(() => {
+    if (!open) return
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open, onClose])
+
+  if (!open) return null
+
   const enemyName = enemyChampionId > 0 ? getChampionName(enemyChampionId) : '对方英雄'
 
-  return (
-    <Modal open={open} onClose={onClose} width={620} height="auto">
-      <div className="scrm">
+  const stopLayerEvent = (event: SyntheticEvent) => {
+    event.stopPropagation()
+  }
+
+  return createPortal(
+    <div
+      className="scrm-backdrop"
+      data-sona-counter-modal="true"
+      onMouseDownCapture={(event) => {
+        event.stopPropagation()
+        if (event.target === event.currentTarget) onClose()
+      }}
+      onClick={stopLayerEvent}
+    >
+      <div className="scrm-panel" onMouseDown={stopLayerEvent} onClick={stopLayerEvent}>
+        <button type="button" className="scrm-close" onClick={onClose} aria-label="关闭 Counter 推荐">
+          ×
+        </button>
+        <div className="scrm">
         <header className="scrm-header">
           <div className="scrm-enemy">
             {enemyChampionId > 0 && <img src={getChampionIcon(enemyChampionId)} alt="" />}
@@ -90,6 +118,8 @@ export function CounterRecommendationModal({
           })}
         </div>
       </div>
-    </Modal>
+      </div>
+    </div>,
+    document.body,
   )
 }
