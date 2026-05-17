@@ -6,6 +6,7 @@ import { SonaInput } from '@/components/ui/SonaInput'
 import { MatchHistoryModal } from '@/components/ui/MatchHistoryModal'
 import { lcu } from '@/lib/lcu'
 import { logger } from '@/index'
+import { useI18n } from '@/lib/i18n'
 import sonaIcon from '@/../assets/Champie_Sona_profileicon.png'
 
 function ParticleCanvas() {
@@ -118,6 +119,7 @@ function ParticleCanvas() {
 }
 
 export function HomePage() {
+  const { t } = useI18n()
   const [searchRiotId, setSearchRiotId] = useState('')
   const [searchError, setSearchError] = useState('')
   const [matchModalOpen, setMatchModalOpen] = useState(false)
@@ -129,7 +131,7 @@ export function HomePage() {
   const handleSearchMatch = async () => {
     const parts = searchRiotId.trim().split('#')
     if (parts.length !== 2 || !parts[0] || !parts[1]) {
-      setSearchError('格式错误，请输入: 名字#Tag')
+      setSearchError(t('home.matchFormatError'))
       return
     }
 
@@ -137,14 +139,14 @@ export function HomePage() {
     try {
       const summoner = await lcu.getSummonerByRiotId(parts[0], parts[1])
       if (!summoner?.puuid) {
-        setSearchError('未找到该召唤师')
+        setSearchError(t('home.matchNotFound'))
         return
       }
       setMatchModalPuuid(summoner.puuid)
       setMatchModalName(`${parts[0]}#${parts[1]}`)
       setMatchModalOpen(true)
     } catch {
-      setSearchError('查询失败，请检查名字和 Tag 是否正确')
+      setSearchError(t('home.matchFailed'))
     }
   }
 
@@ -232,43 +234,43 @@ export function HomePage() {
 
       {/* 欢迎语 */}
       <div className="sona-home-welcome">
-        <h2 className="sona-home-heading">欢迎使用 Sona-E</h2>
+        <h2 className="sona-home-heading">{t('home.welcome')}</h2>
         <p className="sona-home-subtitle">
-          你的英雄联盟客户端增强工具
+          {t('home.subtitle')}
         </p>
       </div>
 
       <section className="sona-home-search">
-        <p className="sona-home-search-title">战绩查询</p>
+        <p className="sona-home-search-title">{t('home.matchTitle')}</p>
         <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={searchRiotId}
               onChange={(v) => { setSearchRiotId(v); setSearchError('') }}
               onKeyDown={(e) => { if (e.key === 'Enter') handleSearchMatch() }}
-              placeholder="名字#Tag (例: Hide on bush#KR1)"
+              placeholder={t('home.matchPlaceholder')}
             />
           </div>
           <SonaButton variant="primary" onClick={handleSearchMatch}>
-            查询
+            {t('home.search')}
           </SonaButton>
         </div>
         {searchError && <p className="sona-home-search-error">{searchError}</p>}
       </section>
 
       <section className="sona-home-search">
-        <p className="sona-home-search-title">回放</p>
-        <p className="sona-home-search-hint">输入 Game ID 下载并观看对局回放。可从战绩面板复制 Game ID。</p>
+        <p className="sona-home-search-title">{t('home.replayTitle')}</p>
+        <p className="sona-home-search-hint">{t('home.replayHint')}</p>
         <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={replayGameId}
               onChange={(v) => { setReplayGameId(v); setReplayState('idle') }}
-              placeholder="输入 Game ID..."
+              placeholder={t('home.replayPlaceholder')}
             />
           </div>
           <SonaButton onClick={handleWatchReplay}>
-            {{ idle: '观看回放', downloading: '下载中...', ready: '已启动', launching: '启动中...', error: '重试' }[replayState]}
+            {{ idle: t('home.replayIdle'), downloading: t('home.replayDownloading'), ready: t('home.replayReady'), launching: t('home.replayLaunching'), error: t('home.replayError') }[replayState]}
           </SonaButton>
         </div>
       </section>
@@ -282,9 +284,9 @@ export function HomePage() {
 
       {/* 琴女语录 */}
       <p className="sona-home-quote">
-        "本项目完全开源免费，如果你通过收费渠道使用，那你被骗啦!"
+        {t('home.quote')}
         <br />
-        &nbsp;—— 神奇的WJZ_P
+        &nbsp;{t('home.quoteAuthor')}
       </p>
     </div>
   )

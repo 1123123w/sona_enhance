@@ -3,10 +3,12 @@ import '@/styles/AboutPage.css'
 import { InfoCard } from '@/components/ui/InfoCard'
 import { ZapIcon, CodeIcon, BoxIcon, GitHubIcon } from '@/components/ui/icons'
 import { store } from '@/lib/store'
+import { useI18n } from '@/lib/i18n'
 
 declare const __PLUGIN_VERSION__: string
 
 export function AboutPage() {
+  const { t } = useI18n()
   const versionClickRef = useRef({ count: 0, timer: 0 })
 
   const handleVersionClick = () => {
@@ -33,23 +35,23 @@ export function AboutPage() {
       </div>
 
       <p className="sona-about-desc">
-        Sona-E 是基于 Sona 维护的英雄联盟客户端自用增强版，运行在 Pengu Loader 之上，保留原版能力并加入 KR OP.GG 推荐、Counter 和 Ban 推荐等个人常用功能。
+        {t('about.desc')}
       </p>
 
       {/* 信息卡片 + 技术栈 并排 */}
       <div className="sona-about-row">
         <div className="sona-about-cards">
-          <InfoCard icon={<ZapIcon />} label="插件" value={`Sona-E v${__PLUGIN_VERSION__}`} />
-          <InfoCard icon={<CodeIcon />} label="框架" value="React + Vite" />
+          <InfoCard icon={<ZapIcon />} label={t('about.plugin')} value={`Sona-E v${__PLUGIN_VERSION__}`} />
+          <InfoCard icon={<CodeIcon />} label={t('about.framework')} value="React + Vite" />
           <InfoCard
             icon={<BoxIcon />}
-            label="加载器"
+            label={t('about.loader')}
             value={`Pengu Loader ${typeof Pengu !== 'undefined' ? Pengu.version : '1.1.6'}`}
           />
         </div>
 
         <div className="sona-about-section sona-about-tech">
-          <h3 className="sona-about-section-title">技术栈</h3>
+          <h3 className="sona-about-section-title">{t('about.stack')}</h3>
           <ul className="sona-about-list">
             <li>React 19 + TypeScript</li>
             <li>Vite 6</li>
@@ -72,20 +74,22 @@ export function AboutPage() {
       </div>
 
       <div className="sona-about-section">
-        <h3 className="sona-about-section-title">上游项目</h3>
+        <h3 className="sona-about-section-title">{t('about.upstream')}</h3>
         <p className="sona-about-text">
-          感谢 <a href="https://github.com/WJZ-P" target="_blank" rel="noopener noreferrer">WJZ-P</a> 创建并维护原版
-          {' '}<a href="https://github.com/WJZ-P/sona" target="_blank" rel="noopener noreferrer">Sona</a>。
+          {t('about.upstreamThanks')}{' '}
+          <a href="https://github.com/WJZ-P" target="_blank" rel="noopener noreferrer">WJZ-P</a>
+          {' / '}
+          <a href="https://github.com/WJZ-P/sona" target="_blank" rel="noopener noreferrer">Sona</a>
         </p>
       </div>
 
       <div className="sona-about-section">
-        <h3 className="sona-about-section-title">开源协议</h3>
+        <h3 className="sona-about-section-title">{t('about.license')}</h3>
         <p className="sona-about-text">AGPL-3.0</p>
       </div>
 
       <div className="sona-about-quote">
-        Sona-E follows the original Sona project and keeps local changes focused on personal workflow.
+        {t('about.quote')}
       </div>
     </div>
   )

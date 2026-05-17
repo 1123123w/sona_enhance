@@ -24,9 +24,6 @@ import { updateLobbyMemberMatchHistory } from '@/lib/features/lobby-member-match
 import { updateAutoHonor } from '@/lib/features/auto-honor'
 import { updateAutoLockChampion } from '@/lib/features/auto-lock-champion'
 import { updateAutoBanChampion } from '@/lib/features/auto-ban-champion'
-import { applyRankDisguise, updateRankDisguise } from '@/lib/features/rank-disguise'
-import { updateCustomProfileBg } from '@/lib/features/profile-background'
-import { updateCustomBanner } from '@/lib/features/custom-banner'
 import { updateGameAnalysisPopup } from '@/lib/features/game-analysis-popup'
 import { updateAutoReturnToLobby } from '@/lib/features/auto-return-to-lobby'
 import { updateOpggBuildRecommendation } from '@/lib/features/opgg-build-recommendation'
@@ -789,22 +786,8 @@ export function initFeatures() {
   updateLobbyMemberMatchHistory(store.get('lobbyEnhancement'))
   store.onChange('lobbyEnhancement', updateLobbyMemberMatchHistory)
 
-  updateCustomProfileBg(store.get('customProfileBg'))
-  store.onChange('customProfileBg', updateCustomProfileBg)
-
-  updateCustomBanner(store.get('customBanner'))
-  store.onChange('customBanner', updateCustomBanner)
-
   updateAutoHonor(store.get('autoHonor'))
   store.onChange('autoHonor', updateAutoHonor)
-
-  // 段位伪装：启动时自动应用，配置变化时重新应用
-  updateRankDisguise(store.get('rankDisguise'))
-  store.onChange('rankDisguise', updateRankDisguise)
-  // 队列/段位/子段位变化时，如果开关开着就重新应用
-  store.onChange('rankQueue', () => { if (store.get('rankDisguise')) applyRankDisguise() })
-  store.onChange('rankTier', () => { if (store.get('rankDisguise')) applyRankDisguise() })
-  store.onChange('rankDivision', () => { if (store.get('rankDisguise')) applyRankDisguise() })
 
   updateAutoLockChampion(store.get('autoLockChampion'))
   store.onChange('autoLockChampion', updateAutoLockChampion)

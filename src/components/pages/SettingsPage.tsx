@@ -8,6 +8,7 @@ import { clearOpggCache } from '@/lib/opgg-api'
 import { lcu } from '@/lib/lcu'
 import { logger } from '@/index'
 import { store } from '@/lib/store'
+import { type AppLanguage, languageOptions, useI18n } from '@/lib/i18n'
 import '@/styles/SettingsPage.css'
 
 const hotkeyOptions = [
@@ -18,16 +19,8 @@ const hotkeyOptions = [
   { value: 'F5', label: 'F5' },
 ]
 
-const effectOptions = [
-  { value: 'none', label: '无（默认）' },
-  { value: 'blurbehind', label: '毛玻璃' },
-  { value: 'acrylic', label: '亚克力' },
-  { value: 'unified', label: '混合' },
-  { value: 'mica', label: '云母 (Win11)' },
-  { value: 'transparent', label: '透明' },
-]
-
 function BackupManager() {
+  const { t } = useI18n()
   const [backupName, setBackupName] = useState('')
   const [backups, setBackups] = useState<{ name: string; timestamp: number }[]>([])
   const [status, setStatus] = useState('')
@@ -41,23 +34,23 @@ function BackupManager() {
 
   const handleBackup = async () => {
     const name = backupName.trim()
-    if (!name) { setStatus('❌ 请输入备份名称'); return }
-    setStatus('⏳ 备份中...')
+    if (!name) { setStatus(`❌ ${t('settings.backup.needName')}`); return }
+    setStatus(`⏳ ${t('settings.backup.saving')}`)
     const ok = await lcu.backupSettings(name)
-    setStatus(ok ? '✅ 备份成功' : '❌ 备份失败')
+    setStatus(ok ? `✅ ${t('settings.backup.success')}` : `❌ ${t('settings.backup.failed')}`)
     if (ok) { setBackupName(''); refreshList() }
   }
 
   const handleRestore = async (name: string) => {
-    setStatus(`⏳ 恢复 "${name}" 中...`)
+    setStatus(`⏳ ${t('settings.backup.restoring', { name })}`)
     const ok = await lcu.restoreSettings(name)
-    setStatus(ok ? `✅ "${name}" 已恢复` : '❌ 恢复失败')
+    setStatus(ok ? `✅ ${t('settings.backup.restored', { name })}` : `❌ ${t('settings.backup.restoreFailed')}`)
   }
 
   const handleDelete = async (name: string) => {
     const ok = await lcu.deleteBackup(name)
     if (ok) {
-      setStatus(`已删除 "${name}"`)
+      setStatus(t('settings.backup.deleted', { name }))
       refreshList()
     }
   }
@@ -76,11 +69,11 @@ function BackupManager() {
             value={backupName}
             onChange={(v) => { setBackupName(v); setStatus('') }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleBackup() }}
-            placeholder="输入备份名称 (如: 排位设置)"
+            placeholder={t('settings.backup.placeholder')}
           />
         </div>
         <SonaButton variant="primary" onClick={handleBackup}>
-          保存备份
+          {t('settings.backup.save')}
         </SonaButton>
       </div>
       {status && <p className="sona-subtitle" style={{ marginTop: 6 }}>{status}</p>}
@@ -93,8 +86,8 @@ function BackupManager() {
                 <span className="sona-backup-time">{formatTime(b.timestamp)}</span>
               </div>
               <div className="sona-backup-actions">
-                <SonaButton onClick={() => handleRestore(b.name)}>恢复</SonaButton>
-                <SonaButton onClick={() => handleDelete(b.name)}>删除</SonaButton>
+                <SonaButton onClick={() => handleRestore(b.name)}>{t('settings.backup.restore')}</SonaButton>
+                <SonaButton onClick={() => handleDelete(b.name)}>{t('settings.backup.delete')}</SonaButton>
               </div>
             </div>
           ))}
@@ -105,12 +98,21 @@ function BackupManager() {
 }
 
 export function SettingsPage() {
+  const { language, setLanguage, t } = useI18n()
   const [hotkey, setHotkey] = useState(store.get('hotkey'))
   const [globalParticle, setGlobalParticle] = useState(store.get('globalParticle'))
   const [hideTFT, setHideTFT] = useState(store.get('hideTFT'))
   const [hideRightNavText, setHideRightNavText] = useState(store.get('hideRightNavText'))
   const [windowEffect, setWindowEffect] = useState(store.get('windowEffect'))
   const [opggCacheStatus, setOpggCacheStatus] = useState('')
+  const effectOptions = [
+    { value: 'none', label: t('settings.effect.none') },
+    { value: 'blurbehind', label: t('settings.effect.blurbehind') },
+    { value: 'acrylic', label: t('settings.effect.acrylic') },
+    { value: 'unified', label: t('settings.effect.unified') },
+    { value: 'mica', label: t('settings.effect.mica') },
+    { value: 'transparent', label: t('settings.effect.transparent') },
+  ]
 
   useEffect(() => {
     const unsubs = [
@@ -137,12 +139,22 @@ export function SettingsPage() {
 
   return (
     <div className="sona-settings">
-      <h2 className="sona-settings-title">设置</h2>
+      <h2 className="sona-settings-title">{t('settings.title')}</h2>
 
-      <SettingGroup title="通用">
+      <SettingGroup title={t('settings.general')}>
         <SettingCard
-          title="面板快捷键"
-          description="随时按下快捷键打开/关闭 Sona 面板。"
+          title={t('settings.language.title')}
+          description={t('settings.language.desc')}
+        >
+          <SonaSelect
+            options={languageOptions.map((option) => ({ value: option.value, label: t(option.labelKey) }))}
+            value={language}
+            onChange={(v) => setLanguage(v as AppLanguage)}
+          />
+        </SettingCard>
+        <SettingCard
+          title={t('settings.hotkey.title')}
+          description={t('settings.hotkey.desc')}
         >
           <SonaSelect
             options={hotkeyOptions}
@@ -151,8 +163,8 @@ export function SettingsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="全局粒子美化"
-          description="为客户端添加星光粒子背景效果 ✨"
+          title={t('settings.particle.title')}
+          description={t('settings.particle.desc')}
         >
           <SonaSwitch
             checked={globalParticle}
@@ -161,10 +173,10 @@ export function SettingsPage() {
         </SettingCard>
       </SettingGroup>
 
-      <SettingGroup title="客户端界面">
+      <SettingGroup title={t('settings.client')}>
         <SettingCard
-          title="隐藏首页云顶之弈"
-          description="隐藏顶部导航栏的云顶之弈入口；不会改变客户端当前记住的 Play 页分类。"
+          title={t('settings.hideTFT.title')}
+          description={t('settings.hideTFT.desc')}
         >
           <SonaSwitch
             checked={hideTFT}
@@ -172,8 +184,8 @@ export function SettingsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="隐藏右侧导航文字"
-          description="隐藏主页顶部右侧导航栏文字，仅保留图标。"
+          title={t('settings.hideRightText.title')}
+          description={t('settings.hideRightText.desc')}
         >
           <SonaSwitch
             checked={hideRightNavText}
@@ -181,8 +193,8 @@ export function SettingsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="窗口特效"
-          description="为客户端窗口添加毛玻璃、亚克力等视觉效果。"
+          title={t('settings.windowEffect.title')}
+          description={t('settings.windowEffect.desc')}
         >
           <div style={{ minWidth: 130 }}>
             <SonaSelect
@@ -194,22 +206,22 @@ export function SettingsPage() {
         </SettingCard>
       </SettingGroup>
 
-      <SettingGroup title="设置备份">
-        <p className="sona-subtitle" style={{ marginBottom: 10 }}>备份当前客户端设置（快捷键、界面布局等），支持多个命名存档。</p>
+      <SettingGroup title={t('settings.backup')}>
+        <p className="sona-subtitle" style={{ marginBottom: 10 }}>{t('settings.backup.desc')}</p>
         <BackupManager />
       </SettingGroup>
 
-      <SettingGroup title="高级选项">
+      <SettingGroup title={t('settings.advanced')}>
         <SettingCard
-          title="清空 OP.GG 缓存"
-          description="清除本地保存的 OP.GG 推荐出装、英雄 T 级和 Counter 数据；下次使用时会重新请求。"
+          title={t('settings.clearOpgg.title')}
+          description={t('settings.clearOpgg.desc')}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <SonaButton onClick={() => {
               const count = clearOpggCache()
-              setOpggCacheStatus(count >= 0 ? `已清空 ${count} 条缓存` : '清空失败')
+              setOpggCacheStatus(count >= 0 ? t('settings.cacheCleared', { count }) : t('settings.cacheFailed'))
             }}>
-              清空
+              {t('settings.clear')}
             </SonaButton>
             {opggCacheStatus && <span className="sona-subtitle">{opggCacheStatus}</span>}
           </div>

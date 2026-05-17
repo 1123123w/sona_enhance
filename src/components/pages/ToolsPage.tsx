@@ -8,14 +8,14 @@ import { searchChampions, getChampionById, type ChampionInfo } from '@/lib/asset
 import { lcu } from '@/lib/lcu'
 import { logger } from '@/index'
 import { store } from '@/lib/store'
+import { useI18n } from '@/lib/i18n'
 import '@/styles/SettingsPage.css'
 
 const toolSections = [
-  { id: 'champ-select', label: '选人增强' },
-  { id: 'opgg', label: 'OP.GG 推荐' },
-  { id: 'automation', label: '对局自动化' },
-  { id: 'social', label: '组队/好友' },
-  { id: 'rank', label: '段位伪装' },
+  { id: 'champ-select', labelKey: 'tools.nav.champSelect' },
+  { id: 'opgg', labelKey: 'tools.nav.opgg' },
+  { id: 'automation', labelKey: 'tools.nav.automation' },
+  { id: 'social', labelKey: 'tools.nav.social' },
 ]
 
 function scrollToToolSection(id: string) {
@@ -26,10 +26,14 @@ function ChampionPriorityCards({
   championIds,
   emptyText,
   onRemove,
+  removeLabel,
+  championFallback,
 }: {
   championIds: number[]
   emptyText: string
   onRemove: (championId: number) => void
+  removeLabel: string
+  championFallback: (championId: number) => string
 }) {
   if (championIds.length === 0) {
     return <p className="sona-subtitle" style={{ margin: 0 }}>{emptyText}</p>
@@ -48,13 +52,13 @@ function ChampionPriorityCards({
               alt=""
             />
             <span className="sona-champ-priority-name">
-              {champion ? `${champion.title} ${champion.name}` : `英雄#${championId}`}
+              {champion ? `${champion.title} ${champion.name}` : championFallback(championId)}
             </span>
             <button
               className="sona-champ-priority-remove"
               type="button"
               onClick={() => onRemove(championId)}
-              aria-label="移除"
+              aria-label={removeLabel}
             >
               ×
             </button>
@@ -66,6 +70,7 @@ function ChampionPriorityCards({
 }
 
 export function ToolsPage() {
+  const { t } = useI18n()
   const [autoAccept, setAutoAccept] = useState(store.get('autoAcceptMatch'))
   // 延迟值在 UI 里用字符串存，避免"删到空 → 变 NaN"、"输到一半"等中间态被推回 store
   const [autoAcceptDelayMin, setAutoAcceptDelayMin] = useState(String(store.get('autoAcceptDelayMin')))
@@ -95,11 +100,6 @@ export function ToolsPage() {
   const [enhancedFriendGameStatus, setEnhancedFriendGameStatus] = useState(store.get('enhancedFriendGameStatus'))
   const [lobbyEnhancement, setLobbyEnhancement] = useState(store.get('lobbyEnhancement'))
   const [lobbyEnhancementFetchCount, setLobbyEnhancementFetchCount] = useState(store.get('lobbyEnhancementFetchCount'))
-  const [customProfileBg, setCustomProfileBg] = useState(store.get('customProfileBg'))
-  const [customBanner, setCustomBanner] = useState(store.get('customBanner'))
-  const [rankQueue, setRankQueue] = useState(store.get('rankQueue'))
-  const [rankTier, setRankTier] = useState(store.get('rankTier'))
-  const [rankDivision, setRankDivision] = useState(store.get('rankDivision'))
   const [autoHonor, setAutoHonor] = useState(store.get('autoHonor'))
   const [autoLockChampion, setAutoLockChampion] = useState(store.get('autoLockChampion'))
   const [autoLockChampionIds, setAutoLockChampionIds] = useState(store.get('autoLockChampionIds'))
@@ -142,16 +142,11 @@ export function ToolsPage() {
       store.onChange('enhancedFriendGameStatus', setEnhancedFriendGameStatus),
       store.onChange('lobbyEnhancement', setLobbyEnhancement),
       store.onChange('lobbyEnhancementFetchCount', setLobbyEnhancementFetchCount),
-      store.onChange('customProfileBg', setCustomProfileBg),
-      store.onChange('customBanner', setCustomBanner),
       store.onChange('autoHonor', setAutoHonor),
       store.onChange('autoLockChampion', setAutoLockChampion),
       store.onChange('autoLockChampionIds', setAutoLockChampionIds),
       store.onChange('autoBanChampion', setAutoBanChampion),
       store.onChange('autoBanChampionIds', setAutoBanChampionIds),
-      store.onChange('rankQueue', setRankQueue),
-      store.onChange('rankTier', setRankTier),
-      store.onChange('rankDivision', setRankDivision),
     ]
     return () => unsubs.forEach((fn) => fn())
   }, [])
@@ -215,21 +210,21 @@ export function ToolsPage() {
 
   return (
     <div className="sona-settings">
-      <h2 className="sona-settings-title">工具</h2>
+      <h2 className="sona-settings-title">{t('tools.title')}</h2>
 
       <div className="sona-tool-nav">
         {toolSections.map((section) => (
           <button key={section.id} type="button" onClick={() => scrollToToolSection(section.id)}>
-            {section.label}
+            {t(section.labelKey)}
           </button>
         ))}
       </div>
 
       <section id="tool-section-champ-select" className="sona-tool-section">
-      <SettingGroup title="选人增强">
+      <SettingGroup title={t('tools.nav.champSelect')}>
         <SettingCard
-          title="自动接受对局"
-          description="匹配到对局时自动点击接受，再也不会错过。"
+          title={t('tools.autoAccept.title')}
+          description={t('tools.autoAccept.desc')}
         >
           <SonaSwitch
             checked={autoAccept}
@@ -238,8 +233,8 @@ export function ToolsPage() {
         </SettingCard>
         {autoAccept && (
           <SettingCard
-            title="自动接受的随机延迟"
-            description="在区间内随机延迟后再接受（上限 15000ms）。"
+            title={t('tools.autoAcceptDelay.title')}
+            description={t('tools.autoAcceptDelay.desc')}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ width: 80 }}>
@@ -252,7 +247,7 @@ export function ToolsPage() {
                     const n = parseInt(cleaned, 10)
                     store.set('autoAcceptDelayMin', Number.isFinite(n) ? n : 0)
                   }}
-                  placeholder="最小"
+                  placeholder={t('tools.min')}
                 />
               </div>
               <span style={{ color: '#a09b8c', fontSize: 13 }}>—</span>
@@ -265,16 +260,16 @@ export function ToolsPage() {
                     const n = parseInt(cleaned, 10)
                     store.set('autoAcceptDelayMax', Number.isFinite(n) ? n : 0)
                   }}
-                  placeholder="最大"
+                  placeholder={t('tools.max')}
                 />
               </div>
-              <span style={{ color: '#a09b8c', fontSize: 13 }}>毫秒</span>
+              <span style={{ color: '#a09b8c', fontSize: 13 }}>{t('tools.ms')}</span>
             </div>
           </SettingCard>
         )}
         <SettingCard
-          title="大乱斗无CD换英雄"
-          description="移除共享池英雄的切换冷却限制，随时换取心仪英雄。"
+          title={t('tools.benchNoCooldown.title')}
+          description={t('tools.benchNoCooldown.desc')}
         >
           <SonaSwitch
             checked={benchNoCooldown}
@@ -282,24 +277,24 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="分析友方战力"
-          description="进入英雄选择时，自动分析队友近期战绩并发送到队伍聊天框。"
+          title={t('tools.analyzeTeamPower.title')}
+          description={t('tools.analyzeTeamPower.desc')}
         >
           <SonaSelect
             value={String(analyzeTeamPowerFetchCount)}
             onChange={(v) => { setAnalyzeTeamPowerFetchCount(Number(v)); store.set('analyzeTeamPowerFetchCount', Number(v)) }}
             options={[
-              { value: '20', label: '近20局' },
-              { value: '50', label: '近50局' },
-              { value: '100', label: '近100局' },
+              { value: '20', label: t('tools.recent20') },
+              { value: '50', label: t('tools.recent50') },
+              { value: '100', label: t('tools.recent100') },
             ]}
           />
           <SonaSelect
             value={analyzeTeamPowerMsgType}
             onChange={(v) => { setAnalyzeTeamPowerMsgType(v); store.set('analyzeTeamPowerMsgType', v) }}
             options={[
-              { value: 'celebration', label: '自己可见' },
-              { value: 'chat', label: '全队可见' },
+              { value: 'celebration', label: t('tools.selfVisible') },
+              { value: 'chat', label: t('tools.teamVisible') },
             ]}
           />
           <SonaSwitch
@@ -308,15 +303,15 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="红蓝方提示"
-          description="进入英雄选择时，在聊天框提示本局是蓝方还是红方。"
+          title={t('tools.sideIndicator.title')}
+          description={t('tools.sideIndicator.desc')}
         >
           <SonaSelect
             value={sideIndicatorMsgType}
             onChange={(v) => { setSideIndicatorMsgType(v); store.set('sideIndicatorMsgType', v) }}
             options={[
-              { value: 'celebration', label: '自己可见' },
-              { value: 'chat', label: '全队可见' },
+              { value: 'celebration', label: t('tools.selfVisible') },
+              { value: 'chat', label: t('tools.teamVisible') },
             ]}
           />
           <SonaSwitch
@@ -325,16 +320,16 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="英雄选择阶段增强"
-          description="选人阶段显示队友近期表现、英雄 T 级角标，并支持点击队友头像查看战绩。"
+          title={t('tools.champSelectAssist.title')}
+          description={t('tools.champSelectAssist.desc')}
         >
           <SonaSelect
             value={String(champSelectAssistFetchCount)}
             onChange={(v) => { setChampSelectAssistFetchCount(Number(v)); store.set('champSelectAssistFetchCount', Number(v)) }}
             options={[
-              { value: '20', label: '近20局' },
-              { value: '50', label: '近50局' },
-              { value: '100', label: '近100局' },
+              { value: '20', label: t('tools.recent20') },
+              { value: '50', label: t('tools.recent50') },
+              { value: '100', label: t('tools.recent100') },
             ]}
           />
           <SonaSwitch
@@ -346,10 +341,10 @@ export function ToolsPage() {
       </section>
 
       <section id="tool-section-opgg" className="sona-tool-section">
-      <SettingGroup title="OP.GG 推荐">
+      <SettingGroup title={t('tools.nav.opgg')}>
         <SettingCard
-          title="配装推荐面板"
-          description="选人阶段打开当前英雄的 OP.GG KR 出装、符文、召唤师技能和 matchup 推荐。Ban 推荐入口也依赖此功能。"
+          title={t('tools.opggBuild.title')}
+          description={t('tools.opggBuild.desc')}
         >
           <SonaSwitch
             checked={opggBuildRecommendation}
@@ -357,8 +352,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="锁定后自动应用符文"
-          description="锁定英雄后自动应用 OP.GG KR 第一套符文；如果已有智能保存符文，会优先保留个人配置。"
+          title={t('tools.autoRunes.title')}
+          description={t('tools.autoRunes.desc')}
         >
           <SonaSwitch
             checked={opggAutoApplyRunes}
@@ -366,8 +361,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="Counter 英雄推荐"
-          description="排位选人时点击敌方头像，基于 OP.GG KR ranked 数据查看 counter 英雄列表。"
+          title={t('tools.counter.title')}
+          description={t('tools.counter.desc')}
         >
           <SonaSwitch
             checked={champSelectCounterRecommendation}
@@ -375,8 +370,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="智能配装 & 符文 & 召唤师技能"
-          description="按英雄和模式同步装备集，并记忆、恢复你手动保存过的符文和召唤师技能。"
+          title={t('tools.smartBuild.title')}
+          description={t('tools.smartBuild.desc')}
         >
           <SonaSwitch
             checked={smartBuildRecommendation}
@@ -387,10 +382,10 @@ export function ToolsPage() {
       </section>
 
       <section id="tool-section-automation" className="sona-tool-section">
-      <SettingGroup title="对局自动化">
+      <SettingGroup title={t('tools.nav.automation')}>
         <SettingCard
-          title="平衡性调整buff提示"
-          description="游玩特定模式（大乱斗、无限火力）时，鼠标悬停在英雄头像上，显示对应的平衡性数值调整。"
+          title={t('tools.balanceBuff.title')}
+          description={t('tools.balanceBuff.desc')}
         >
           <SonaSwitch
             checked={balanceBuffTooltip}
@@ -408,16 +403,16 @@ export function ToolsPage() {
           />
         </SettingCard> */}
         <SettingCard
-          title="全局战力分析弹窗"
-          description="进入游戏后，自动弹窗展示双方队伍战力分析，包括胜率、KDA、段位、开黑分组。(注，不是直接在游戏内展示，需要切回客户端查看)"
+          title={t('tools.gameAnalysis.title')}
+          description={t('tools.gameAnalysis.desc')}
         >
           <SonaSelect
             value={String(gameAnalysisFetchCount)}
             onChange={(v) => { setGameAnalysisFetchCount(Number(v)); store.set('gameAnalysisFetchCount', Number(v)) }}
             options={[
-              { value: '20', label: '近20局' },
-              { value: '50', label: '近50局' },
-              { value: '100', label: '近100局' },
+              { value: '20', label: t('tools.recent20') },
+              { value: '50', label: t('tools.recent50') },
+              { value: '100', label: t('tools.recent100') },
             ]}
           />
           <SonaSwitch
@@ -426,15 +421,15 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="对局结束自动返回房间"
-          description="对局结束后自动返回房间，省去手动操作。可选择自动排队或仅返回房间。"
+          title={t('tools.autoReturn.title')}
+          description={t('tools.autoReturn.desc')}
         >
           <SonaSelect
             value={autoReturnMode}
             onChange={(v) => { setAutoReturnMode(v); store.set('autoReturnMode', v) }}
             options={[
-              { value: 'queue', label: '自动排队' },
-              { value: 'lobby', label: '仅返回房间' },
+              { value: 'queue', label: t('tools.autoQueue') },
+              { value: 'lobby', label: t('tools.returnLobbyOnly') },
             ]}
           />
           <SonaSwitch
@@ -443,8 +438,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="对局结束自动点赞"
-          description="对局结束后，随机给队友点赞，再也不用手点啦。"
+          title={t('tools.autoHonor.title')}
+          description={t('tools.autoHonor.desc')}
         >
           <SonaSwitch
             checked={autoHonor}
@@ -452,8 +447,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="秒抢英雄"
-          description="进入可选英雄的模式时，轮到自己自动秒锁指定英雄。大乱斗等无需选人的模式不受影响。"
+          title={t('tools.autoLock.title')}
+          description={t('tools.autoLock.desc')}
         >
           <SonaSwitch
             checked={autoLockChampion}
@@ -472,7 +467,7 @@ export function ToolsPage() {
                     setChampSuggestions(results)
                     setShowChampSuggestions(results.length > 0)
                   }}
-                  placeholder="输入英雄名/称号搜索 (如: 亚索)"
+                  placeholder={t('tools.autoLock.placeholder')}
                 />
                 {showChampSuggestions && champSuggestions.length > 0 && (
                   <div className="sona-champ-suggest">
@@ -495,25 +490,27 @@ export function ToolsPage() {
                 variant={autoLockInstant ? 'primary' : undefined}
                 onClick={() => { setAutoLockInstant(true); store.set('autoLockInstant', true) }}
               >
-                秒选并锁定{autoLockInstant ? ' ✓' : ''}
+                {t('tools.autoLock.lock')}{autoLockInstant ? t('tools.selected') : ''}
               </SonaButton>
               <SonaButton
                 variant={!autoLockInstant ? 'primary' : undefined}
                 onClick={() => { setAutoLockInstant(false); store.set('autoLockInstant', false) }}
               >
-                仅预选{!autoLockInstant ? ' ✓' : ''}
+                {t('tools.autoLock.pick')}{!autoLockInstant ? t('tools.selected') : ''}
               </SonaButton>
             </div>
             <ChampionPriorityCards
               championIds={autoLockChampionIds}
-              emptyText="还没有添加秒抢英雄，按优先级从左到右尝试。"
+              emptyText={t('tools.autoLock.empty')}
               onRemove={removeAutoLockChampion}
+              removeLabel={t('tools.removeChampion')}
+              championFallback={(id) => t('tools.championFallback', { id })}
             />
           </div>
         )}
         <SettingCard
-          title="自动 Ban 英雄"
-          description="进入有禁用阶段的模式时，轮到自己自动禁用指定英雄。匹配、大乱斗等无ban的不受影响。"
+          title={t('tools.autoBan.title')}
+          description={t('tools.autoBan.desc')}
         >
           <SonaSwitch
             checked={autoBanChampion}
@@ -532,7 +529,7 @@ export function ToolsPage() {
                     setBanChampSuggestions(results)
                     setShowBanChampSuggestions(results.length > 0)
                   }}
-                  placeholder="搜索要 Ban 的英雄 (如: 亚索 / Yasuo)"
+                  placeholder={t('tools.autoBan.placeholder')}
                 />
                 {showBanChampSuggestions && (
                   <div className="sona-champ-suggest">
@@ -554,8 +551,10 @@ export function ToolsPage() {
             </div>
             <ChampionPriorityCards
               championIds={autoBanChampionIds}
-              emptyText="还没有添加自动 Ban 英雄，按优先级从左到右尝试。"
+              emptyText={t('tools.autoBan.empty')}
               onRemove={removeAutoBanChampion}
+              removeLabel={t('tools.removeChampion')}
+              championFallback={(id) => t('tools.championFallback', { id })}
             />
           </div>
         )}
@@ -563,10 +562,10 @@ export function ToolsPage() {
       </section>
 
       <section id="tool-section-social" className="sona-tool-section">
-      <SettingGroup title="组队/好友">
+      <SettingGroup title={t('tools.nav.social')}>
         <SettingCard
-          title="解锁自定义签名"
-          description="移除客户端对签名编辑的禁用限制，可自由修改个人签名。"
+          title={t('tools.unlockStatus.title')}
+          description={t('tools.unlockStatus.desc')}
         >
           <SonaSwitch
             checked={unlockStatus}
@@ -574,8 +573,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="解锁在线状态切换"
-          description="接管客户端的状态按钮，支持切换至隐身、手机在线等客户端默认不提供的状态。"
+          title={t('tools.unlockAvailability.title')}
+          description={t('tools.unlockAvailability.desc')}
         >
           <SonaSwitch
             checked={unlockAvailability}
@@ -583,8 +582,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="解锁炫彩分页（国服）"
-          description="在生涯藏品页恢复被隐藏的「炫彩」子分页。修改开关后需要重启客户端才能生效。"
+          title={t('tools.unlockChromas.title')}
+          description={t('tools.unlockChromas.desc')}
         >
           <SonaSwitch
             checked={unlockChromas}
@@ -592,8 +591,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="卸下头像边框"
-          description="移除头像框装饰，恢复干净的头像展示。(需召唤师等级>=525)"
+          title={t('tools.removeBorder.title')}
+          description={t('tools.removeBorder.desc')}
         >
           <SonaButton onClick={async () => {
             try {
@@ -607,12 +606,12 @@ export function ToolsPage() {
               logger.error('卸下头像边框失败:', err)
             }
           }}>
-            卸下
+            {t('tools.remove')}
           </SonaButton>
         </SettingCard>
         <SettingCard
-          title="卸下头像"
-          description="将召唤师头像恢复为客户端默认头像。"
+          title={t('tools.removeAvatar.title')}
+          description={t('tools.removeAvatar.desc')}
         >
           <SonaButton onClick={async () => {
             try {
@@ -622,30 +621,12 @@ export function ToolsPage() {
               logger.error('恢复默认头像失败:', err)
             }
           }}>
-            卸下
+            {t('tools.remove')}
           </SonaButton>
         </SettingCard>
         <SettingCard
-          title="自定义生涯背景"
-          description="增强修改生涯背景弹窗，可以选择任意皮肤作为生涯背景。(好友可见)"
-        >
-          <SonaSwitch
-            checked={customProfileBg}
-            onChange={(v) => { setCustomProfileBg(v); store.set('customProfileBg', v) }}
-          />
-        </SettingCard>
-        <SettingCard
-          title="自定义旗帜"
-          description="在原有设置旗帜处新增自定义旗帜按钮，更换的旗帜仅自己可见。"
-        >
-          <SonaSwitch
-            checked={customBanner}
-            onChange={(v) => { setCustomBanner(v); store.set('customBanner', v) }}
-          />
-        </SettingCard>
-        <SettingCard
-          title="开黑好友标记"
-          description="好友列表中，同局开黑的好友使用同色标记。"
+          title={t('tools.friendGroup.title')}
+          description={t('tools.friendGroup.desc')}
         >
           <SonaSwitch
             checked={friendSmartGroup}
@@ -653,8 +634,8 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="增强游戏中好友状态"
-          description="好友游戏中时，在右侧好友列表显示游戏模式和对局时长。"
+          title={t('tools.friendStatus.title')}
+          description={t('tools.friendStatus.desc')}
         >
           <SonaSwitch
             checked={enhancedFriendGameStatus}
@@ -662,16 +643,16 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
-          title="组队界面增强"
-          description="组队界面点击成员头像区域查看战绩，并显示该模式近期胜率、KDA 和评分。"
+          title={t('tools.lobbyEnhancement.title')}
+          description={t('tools.lobbyEnhancement.desc')}
         >
           <SonaSelect
             value={String(lobbyEnhancementFetchCount)}
             onChange={(v) => { setLobbyEnhancementFetchCount(Number(v)); store.set('lobbyEnhancementFetchCount', Number(v)) }}
             options={[
-              { value: '20', label: '近20局' },
-              { value: '50', label: '近50局' },
-              { value: '100', label: '近100局' },
+              { value: '20', label: t('tools.recent20') },
+              { value: '50', label: t('tools.recent50') },
+              { value: '100', label: t('tools.recent100') },
             ]}
           />
           <SonaSwitch
@@ -682,70 +663,6 @@ export function ToolsPage() {
       </SettingGroup>
       </section>
 
-      <section id="tool-section-rank" className="sona-tool-section">
-      <SettingGroup title="段位伪装">
-        <p className="sona-subtitle" style={{ marginBottom: 10 }}>伪装好友列表中显示的段位信息，仅影响聊天名片展示，不影响生涯页面。(好友可见)</p>
-        <div className="sona-debug-actions" style={{ alignItems: 'center' }}>
-          <div style={{ minWidth: 140 }}>
-            <SonaSelect
-              options={[
-                { value: 'RANKED_SOLO_5x5', label: '单排/双排' },
-                { value: 'RANKED_FLEX_SR', label: '灵活组排' },
-                { value: 'RANKED_FLEX_TT', label: '灵活 3v3' },
-                { value: 'RANKED_TFT', label: '云顶之弈' },
-                { value: 'RANKED_TFT_DOUBLE_UP', label: '云顶双人' },
-                { value: 'RANKED_TFT_TURBO', label: '云顶激斗' },
-              ]}
-              value={rankQueue}
-              onChange={setRankQueue}
-            />
-          </div>
-          <div style={{ minWidth: 130 }}>
-            <SonaSelect
-              options={[
-                { value: 'CHALLENGER', label: '最强王者' },
-                { value: 'GRANDMASTER', label: '傲世宗师' },
-                { value: 'MASTER', label: '超凡大师' },
-                { value: 'DIAMOND', label: '璀璨钻石' },
-                { value: 'EMERALD', label: '流光翡翠' },
-                { value: 'PLATINUM', label: '华贵铂金' },
-                { value: 'GOLD', label: '荣耀黄金' },
-                { value: 'SILVER', label: '不屈白银' },
-                { value: 'BRONZE', label: '英勇青铜' },
-                { value: 'IRON', label: '坚韧黑铁' },
-              ]}
-              value={rankTier}
-              onChange={setRankTier}
-            />
-          </div>
-          <div style={{ minWidth: 80 }}>
-            <SonaSelect
-              options={[
-                { value: 'I', label: 'I' },
-                { value: 'II', label: 'II' },
-                { value: 'III', label: 'III' },
-                { value: 'IV', label: 'IV' },
-              ]}
-              value={rankDivision}
-              onChange={setRankDivision}
-            />
-          </div>
-          <SonaButton onClick={() => {
-            store.set('rankQueue', rankQueue)
-            store.set('rankTier', rankTier)
-            store.set('rankDivision', rankDivision)
-            store.set('rankDisguise', true)
-          }}>
-            应用
-          </SonaButton>
-          <SonaButton onClick={() => {
-            store.set('rankDisguise', false)
-          }}>
-            恢复
-          </SonaButton>
-        </div>
-      </SettingGroup>
-      </section>
     </div>
   )
 }

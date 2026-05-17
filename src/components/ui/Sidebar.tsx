@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import { MusicIcon, ChevronLeftIcon, ChevronRightIcon } from '@/components/ui/icons'
+import { useI18n } from '@/lib/i18n'
 import '@/styles/Sidebar.css'
 
 export interface SidebarItem {
@@ -17,6 +18,7 @@ export interface SidebarProps {
 }
 
 export function Sidebar({ items, activeId, onSelect, collapsed, onToggle }: SidebarProps) {
+  const { t } = useI18n()
   return (
     <div className={`sona-sidebar${collapsed ? ' sona-sidebar--collapsed' : ''}`}>
       {/* Logo 区域 */}
@@ -42,7 +44,7 @@ export function Sidebar({ items, activeId, onSelect, collapsed, onToggle }: Side
 
       {/* 底部展开/收缩按钮 */}
       <div className="sona-sidebar-footer">
-        <button className="sona-sidebar-toggle" onClick={onToggle} title={collapsed ? '展开侧边栏' : '收起侧边栏'}>
+        <button className="sona-sidebar-toggle" onClick={onToggle} title={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}>
           {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </button>
       </div>

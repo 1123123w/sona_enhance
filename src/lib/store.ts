@@ -45,6 +45,8 @@ export interface SonaConfig {
   statusMessage: Record<string, string>
   /** 面板快捷键 */
   hotkey: string
+  /** 界面语言 */
+  language: 'zh-CN' | 'zh-TW' | 'en-US'
   /** 窗口视觉特效 */
   windowEffect: string
   /** 英雄选择玩家头像交互（点击队友头像展示历史数据） */
@@ -101,34 +103,14 @@ export interface SonaConfig {
   lobbyEnhancement: boolean
   /** 组队界面增强查询局数（20/50/100），默认50 */
   lobbyEnhancementFetchCount: number
-  /** 自定义生涯背景 */
-  customProfileBg: boolean
   /** 无视他人生涯隐私（XHR 响应改写，需重启生效） */
   ignoreProfilePrivacy: boolean
-  /** 自定义挑战旗帜 */
-  customBanner: boolean
-  /** 自定义挑战旗帜选择（仅本地显示） */
-  customBannerSelection: {
-    id: string
-    name: string
-    assetPath: string
-    bannerType: string
-    bannerRank: string
-  } | null
   /** 隐藏客户端云顶之弈入口 */
   hideTFT: boolean
   /** 隐藏主页右侧导航栏文字（仅保留图标） */
   hideRightNavText: boolean
   /** 对局结束自动点赞 */
   autoHonor: boolean
-  /** 段位伪装开关 */
-  rankDisguise: boolean
-  /** 伪装队列 */
-  rankQueue: string
-  /** 伪装段位 */
-  rankTier: string
-  /** 段位伪装子段位 */
-  rankDivision: string
   /** 秒抢英雄开关 */
   autoLockChampion: boolean
   /** 秒抢目标英雄优先级队列 */
@@ -168,6 +150,7 @@ const DEFAULT_CONFIG: SonaConfig = {
   availability: 'chat',
   statusMessage: {},
   hotkey: 'F1',
+  language: 'zh-CN',
   windowEffect: 'none',
   champSelectAssist: false,
   opggBuildRecommendation: false,
@@ -192,15 +175,8 @@ const DEFAULT_CONFIG: SonaConfig = {
   lobbyEnhancementFetchCount: 50,
   hideTFT: false,
   hideRightNavText: false,
-  customProfileBg: false,
   ignoreProfilePrivacy: true,
-  customBanner: false,
-  customBannerSelection: null,
   autoHonor: false,
-  rankDisguise: false,
-  rankQueue: 'RANKED_SOLO_5x5',
-  rankTier: 'CHALLENGER',
-  rankDivision: 'I',
   autoLockChampion: false,
   autoLockChampionIds: [],
   autoLockInstant: true,
