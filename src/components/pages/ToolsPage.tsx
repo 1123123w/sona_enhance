@@ -363,7 +363,7 @@ export function ToolsPage() {
         playerName={matchModalName}
       />
 
-      <SettingGroup title="对局相关">
+      <SettingGroup title="选人增强">
         <SettingCard
           title="自动接受对局"
           description="匹配到对局时自动点击接受，再也不会错过。"
@@ -463,7 +463,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="英雄选择阶段增强"
-          description="英雄选择时显示粒子特效、队友近期胜率/KDA 和英雄 T 级角标；点击队友头像可查询近期战绩。"
+          description="选人阶段显示队友近期表现、英雄 T 级角标，并支持点击队友头像查看战绩。"
         >
           <SonaSelect
             value={String(champSelectAssistFetchCount)}
@@ -479,9 +479,12 @@ export function ToolsPage() {
             onChange={(v) => { setChampSelectAssist(v); store.set('champSelectAssist', v) }}
           />
         </SettingCard>
+      </SettingGroup>
+
+      <SettingGroup title="OP.GG 推荐">
         <SettingCard
           title="配装推荐面板"
-          description="锁定英雄后，点击皮肤选择下方的按钮以打开当前英雄的 OP.GG 配装、符文和海克斯推荐。"
+          description="选人阶段打开当前英雄的 OP.GG KR 出装、符文、召唤师技能和 matchup 推荐。Ban 推荐入口也依赖此功能。"
         >
           <SonaSwitch
             checked={opggBuildRecommendation}
@@ -490,7 +493,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="锁定后自动应用符文"
-          description="开启配装推荐后，锁定英雄时自动应用 OP.GG KR 推荐的第一套符文。"
+          description="锁定英雄后自动应用 OP.GG KR 第一套符文；如果已有智能保存符文，会优先保留个人配置。"
         >
           <SonaSwitch
             checked={opggAutoApplyRunes}
@@ -499,7 +502,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="Counter 英雄推荐"
-          description="排位选人时，根据对方已选英雄，使用 OP.GG KR ranked 数据推荐克制英雄。国服只用于读取当前选人。"
+          description="排位选人时点击敌方头像，基于 OP.GG KR ranked 数据查看 counter 英雄列表。"
         >
           <SonaSwitch
             checked={champSelectCounterRecommendation}
@@ -508,13 +511,16 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="智能配装 & 符文 & 召唤师技能"
-          description="根据所选模式、英雄智能配装，并针对游戏模式和英雄智能保存符文、召唤师技能，再也不需要频繁手切符文和召唤师技能！"
+          description="按英雄和模式同步装备集，并记忆、恢复你手动保存过的符文和召唤师技能。"
         >
           <SonaSwitch
             checked={smartBuildRecommendation}
             onChange={(v) => { setSmartBuildRecommendation(v); store.set('smartBuildRecommendation', v) }}
           />
         </SettingCard>
+      </SettingGroup>
+
+      <SettingGroup title="对局自动化">
         <SettingCard
           title="平衡性调整buff提示"
           description="游玩特定模式（大乱斗、无限火力）时，鼠标悬停在英雄头像上，显示对应的平衡性数值调整。"
@@ -688,7 +694,7 @@ export function ToolsPage() {
         )}
       </SettingGroup>
 
-      <SettingGroup title="社交">
+      <SettingGroup title="组队/好友">
         <SettingCard
           title="解锁自定义签名"
           description="移除客户端对签名编辑的禁用限制，可自由修改个人签名。"
@@ -770,7 +776,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="开黑好友标记"
-          description="好友列表中，开黑中的好友在右侧用同样颜色标记，看看谁在偷偷开黑！"
+          description="好友列表中，同局开黑的好友使用同色标记。"
         >
           <SonaSwitch
             checked={friendSmartGroup}
@@ -788,7 +794,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="组队界面增强"
-          description="开启后，组队界面点击头像即可查看召唤师战绩，且旗帜上方显示近期表现。"
+          description="组队界面点击成员头像区域查看战绩，并显示该模式近期胜率、KDA 和评分。"
         >
           <SonaSelect
             value={String(lobbyEnhancementFetchCount)}
@@ -806,10 +812,10 @@ export function ToolsPage() {
         </SettingCard>
       </SettingGroup>
 
-      <SettingGroup title="界面">
+      <SettingGroup title="客户端界面">
         <SettingCard
           title="隐藏首页云顶之弈"
-          description="隐藏顶部导航栏的云顶之弈入口。"
+          description="隐藏顶部导航栏的云顶之弈入口；不会改变客户端当前记住的 Play 页分类。"
         >
           <SonaSwitch
             checked={hideTFT}
@@ -818,7 +824,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="隐藏右侧导航文字"
-          description="隐藏主页顶部右侧导航栏的文字标签，仅保留图标，界面更简洁。"
+          description="隐藏主页顶部右侧导航栏文字，仅保留图标。"
         >
           <SonaSwitch
             checked={hideRightNavText}
@@ -827,7 +833,7 @@ export function ToolsPage() {
         </SettingCard>
         <SettingCard
           title="窗口特效"
-          description="为客户端窗口添加毛玻璃等视觉效果。Win10 拖动窗口时可能卡顿。但实际测试下来好像没啥效果？"
+          description="为客户端窗口添加毛玻璃、亚克力等视觉效果。"
         >
           <div style={{ minWidth: 130 }}>
             <SonaSelect

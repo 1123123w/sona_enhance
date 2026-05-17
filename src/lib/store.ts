@@ -188,7 +188,7 @@ const DEFAULT_CONFIG: SonaConfig = {
   globalParticle: false,
   friendSmartGroup: false,
   enhancedFriendGameStatus: true,
-  lobbyEnhancement: true,
+  lobbyEnhancement: false,
   lobbyEnhancementFetchCount: 50,
   hideTFT: false,
   hideRightNavText: false,
