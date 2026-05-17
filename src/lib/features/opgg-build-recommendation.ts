@@ -15,10 +15,12 @@ import { createRoot, type Root } from 'react-dom/client'
 import { getAugmentInfo, getChampionById, getQueue, getQueueName } from '@/lib/assets'
 import { OpggBuildRecommendationPanel, type BuildRecommendation, type RecommendationContext } from '@/components/ui/OpggBuildRecommendationPanel'
 import { lcu, LcuEventUri, type ChampSelectSession, type ItemSet, type ItemSetBlock, type LCUEventMessage } from '@/lib/lcu'
+import { applyOpggRunePage } from '@/lib/opgg-runes'
 import { store } from '@/lib/store'
 import { aramggApi, type AramggChampionRecommendation, type AramggChampionStatEntry, type AramggCoreItemBuild, type AramggMayhemAugments } from '@/lib/aramgg-api'
 import {
   OPGG_CACHE_CLEARED_EVENT,
+  OPGG_DATA_REGION,
   opggApi,
   type OpggAugmentGroup,
   type OpggArenaModeChampion,
@@ -85,7 +87,9 @@ let outsideCloseHandler: ((event: MouseEvent) => void) | null = null
 let activePanelKey = ''
 let panelReactRoot: Root | null = null
 let lastAppliedItemSetKey = ''
+let lastAppliedRuneKey = ''
 const itemSetSyncInFlightKeys = new Set<string>()
+const runeSyncInFlightKeys = new Set<string>()
 
 function getLocalChampionId(session: ChampSelectSession): number {
   const localPlayer = session.myTeam.find((player) => player.cellId === session.localPlayerCellId)
@@ -437,6 +441,54 @@ function syncRecommendedItemSetWhenReady(entry: RecommendationCacheEntry): void 
     })
 }
 
+function getManagedRuneKey(context: RecommendationContext): string {
+  return [
+    context.championId,
+    context.queueId,
+    context.gameMode || 'unknown',
+    context.position,
+    getEffectiveOpggTier(context),
+  ].join('|')
+}
+
+function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
+  if (!store.get('opggBuildRecommendation')) return
+  if (!store.get('opggAutoApplyRunes')) return
+  if (!currentChampionLocked) return
+
+  const syncKey = getManagedRuneKey(entry.context)
+  if (lastAppliedRuneKey === syncKey || runeSyncInFlightKeys.has(syncKey)) return
+
+  runeSyncInFlightKeys.add(syncKey)
+  entry.promise
+    .then(async (recommendation) => {
+      if (!recommendation || !store.get('opggBuildRecommendation') || !store.get('opggAutoApplyRunes')) return
+      if (!currentChampionLocked) return
+      if (!isCurrentRecommendationContext(entry.context)) return
+      if (lastAppliedRuneKey === syncKey) return
+
+      const rune = recommendation.runePages[0]
+      if (!rune) {
+        logger.info('[OPGG] 自动符文跳过：当前模式或英雄暂无可用符文')
+        return
+      }
+
+      const championName = getChampionName(entry.context.championId)
+      await applyOpggRunePage(rune, championName)
+      lastAppliedRuneKey = syncKey
+      logger.info('[OPGG] 自动符文已应用：%s', championName)
+      lcu.sendChampSelectMessage(`${championName} 符文已自动应用 - Sona`, 'celebration').catch((err) => {
+        logger.warn('[OPGG] 自动符文本地提示发送失败:', err)
+      })
+    })
+    .catch((err) => {
+      logger.warn('[OPGG] 自动符文应用失败:', err)
+    })
+    .finally(() => {
+      runeSyncInFlightKeys.delete(syncKey)
+    })
+}
+
 async function refreshContext(session?: ChampSelectSession) {
   try {
     const currentSession = session ?? await lcu.getChampSelectSession()
@@ -469,6 +521,7 @@ async function refreshContext(session?: ChampSelectSession) {
       const cacheEntry = ensureRecommendationPrefetch(currentContext)
       if (cacheEntry && currentChampionLocked) {
         syncRecommendedItemSetWhenReady(cacheEntry)
+        syncRecommendedRuneWhenReady(cacheEntry)
       }
     } else {
       unmount(false)
@@ -728,11 +781,11 @@ async function getChampionWithVersionFallback(options: {
   version?: string
 }): Promise<OpggChampion> {
   try {
-    return await opggApi.getChampion({ ...options, region: 'global' })
+    return await opggApi.getChampion({ ...options, region: OPGG_DATA_REGION })
   } catch (err) {
     if (!options.version) throw err
     logger.warn('[OPGG] 版本 %s 请求失败，回退到 OP.GG 最新版本:', options.version, err)
-    return opggApi.getChampion({ ...options, region: 'global', version: undefined })
+    return opggApi.getChampion({ ...options, region: OPGG_DATA_REGION, version: undefined })
   }
 }
 
@@ -853,7 +906,10 @@ async function openRecommendationPanel(anchor: HTMLElement, contextOverride?: Re
     store.set('opggBuildRecommendationTier', nextTier)
     recommendationCache.delete(getRecommendationCacheKey(context))
     const cacheEntry = ensureRecommendationPrefetch(context)
-    if (cacheEntry) syncRecommendedItemSetWhenReady(cacheEntry)
+    if (cacheEntry) {
+      syncRecommendedItemSetWhenReady(cacheEntry)
+      syncRecommendedRuneWhenReady(cacheEntry)
+    }
     void openRecommendationPanel(anchor, context)
   }
 
@@ -1005,7 +1061,9 @@ function unmount(resetContext = true) {
   }
   currentChampionLocked = false
   lastAppliedItemSetKey = ''
+  lastAppliedRuneKey = ''
   itemSetSyncInFlightKeys.clear()
+  runeSyncInFlightKeys.clear()
   closePanel()
 }
 
@@ -1045,6 +1103,8 @@ export function updateOpggBuildRecommendation(enabled: boolean) {
 window.addEventListener(OPGG_CACHE_CLEARED_EVENT, () => {
   recommendationCache.clear()
   itemSetSyncInFlightKeys.clear()
+  runeSyncInFlightKeys.clear()
   activePanelKey = ''
   lastAppliedItemSetKey = ''
+  lastAppliedRuneKey = ''
 })

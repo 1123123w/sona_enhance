@@ -9,7 +9,7 @@ import { logger } from '@/index'
 import { injector } from '@/lib/InjectorManager'
 import { getQueue } from '@/lib/assets'
 import { lcu, LcuEventUri, type ChampSelectSession, type LCUEventMessage } from '@/lib/lcu'
-import { OPGG_CACHE_CLEARED_EVENT, opggApi, type OpggChampionsTier, type OpggMode, type OpggRankedDataItem, type OpggTier } from '@/lib/opgg-api'
+import { OPGG_CACHE_CLEARED_EVENT, OPGG_DATA_REGION, opggApi, type OpggChampionsTier, type OpggMode, type OpggRankedDataItem, type OpggTier } from '@/lib/opgg-api'
 import { store } from '@/lib/store'
 import type { GameflowPhase } from '@/types/lcu'
 
@@ -171,7 +171,7 @@ function ensureTierMap(mode: OpggMode, tier = getEffectiveTier(mode)): Promise<M
   if (cached?.promise) return cached.promise
 
   const entry: TierCacheEntry = {}
-  entry.promise = opggApi.getChampionsTier({ region: 'global', mode, tier })
+  entry.promise = opggApi.getChampionsTier({ region: OPGG_DATA_REGION, mode, tier })
     .then((data) => {
       const tierMap = buildTierMap(data, mode)
       entry.data = tierMap

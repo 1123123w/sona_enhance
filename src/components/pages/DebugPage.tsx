@@ -10,7 +10,7 @@ import { lcu, SGP_SERVERS } from '@/lib/lcu'
 import { aramggApi } from '@/lib/aramgg-api'
 import { searchChampions, type ChampionInfo, getChampionBalanceMeta, getAllChampionBalances } from '@/lib/assets'
 import { openOpggBuildRecommendationDebugPanel } from '@/lib/features/opgg-build-recommendation'
-import { opggApi } from '@/lib/opgg-api'
+import { OPGG_DATA_REGION, opggApi } from '@/lib/opgg-api'
 import { logger } from '@/index'
 import '@/styles/SettingsPage.css'
 
@@ -54,7 +54,7 @@ export function DebugPage() {
   }
 
   const testOpggConnectivity = async () => {
-    const url = 'https://lol-api-champion.op.gg/api/global/champions/ranked/versions'
+    const url = `https://lol-api-champion.op.gg/api/${OPGG_DATA_REGION}/champions/ranked/versions`
     const startedAt = performance.now()
     const controller = new AbortController()
     const timer = window.setTimeout(() => controller.abort(), 10000)
@@ -220,7 +220,7 @@ export function DebugPage() {
     const tier = 'platinum_plus'
     const champion = await opggApi.getChampion({
       id: championId,
-      region: 'global',
+      region: OPGG_DATA_REGION,
       mode,
       position,
       tier,
@@ -230,7 +230,7 @@ export function DebugPage() {
     return {
       request: {
         championId,
-        region: 'global',
+        region: OPGG_DATA_REGION,
         mode,
         position,
         tier,
@@ -516,12 +516,12 @@ export function DebugPage() {
             测试 OP.GG API
           </SonaButton>
           <SonaButton onClick={() => runAndLog('OP.GG ranked 版本列表', () =>
-            fetchOpggJson('/api/global/champions/ranked/versions')
+            fetchOpggJson(`/api/${OPGG_DATA_REGION}/champions/ranked/versions`)
           )}>
             ranked 版本
           </SonaButton>
           <SonaButton onClick={() => runAndLog('OP.GG ranked 英雄列表', () =>
-            fetchOpggJson('/api/global/champions/ranked', { tier: 'platinum_plus' })
+            fetchOpggJson(`/api/${OPGG_DATA_REGION}/champions/ranked`, { tier: 'platinum_plus' })
           )}>
             ranked 列表
           </SonaButton>
@@ -529,7 +529,7 @@ export function DebugPage() {
         <div className="sona-debug-actions" style={{ marginTop: 8 }}>
           <SonaButton onClick={() => runAndLog('OP.GG 单英雄 ranked', async () => {
             const id = await getOpggDebugChampionId()
-            return fetchOpggJson(`/api/global/champions/ranked/${id}/mid`, { tier: 'platinum_plus' })
+            return fetchOpggJson(`/api/${OPGG_DATA_REGION}/champions/ranked/${id}/mid`, { tier: 'platinum_plus' })
           })}>
             单英雄 ranked
           </SonaButton>
@@ -538,13 +538,13 @@ export function DebugPage() {
           </SonaButton>
           <SonaButton onClick={() => runAndLog('OP.GG 单英雄 ARAM', async () => {
             const id = await getOpggDebugChampionId()
-            return fetchOpggJson(`/api/global/champions/aram/${id}/none`, { tier: 'platinum_plus' })
+            return fetchOpggJson(`/api/${OPGG_DATA_REGION}/champions/aram/${id}/none`, { tier: 'platinum_plus' })
           })}>
             单英雄 ARAM
           </SonaButton>
           <SonaButton onClick={() => runAndLog('OP.GG 单英雄 Arena', async () => {
             const id = await getOpggDebugChampionId()
-            return fetchOpggJson(`/api/global/champions/arena/${id}`, { tier: 'all' })
+            return fetchOpggJson(`/api/${OPGG_DATA_REGION}/champions/arena/${id}`, { tier: 'all' })
           })}>
             单英雄 Arena
           </SonaButton>

@@ -27,6 +27,7 @@ import { updateCustomBanner } from '@/lib/features/custom-banner'
 import { updateGameAnalysisPopup } from '@/lib/features/game-analysis-popup'
 import { updateAutoReturnToLobby } from '@/lib/features/auto-return-to-lobby'
 import { updateOpggBuildRecommendation } from '@/lib/features/opgg-build-recommendation'
+import { updateOpggBanRecommendation } from '@/lib/features/opgg-ban-recommendation'
 import { updateChampSelectCounterRecommendation } from '@/lib/features/champselect-counter-recommendation'
 import { preloadChampSelectTierBadgeData, updateChampSelectTierBadge } from '@/lib/features/champselect-tier-badge'
 import { setAvailabilityHijackEnabled, setHideTFTEnabled, setHideRightNavTextEnabled } from '@/lib/injections'
@@ -730,7 +731,9 @@ export function initFeatures() {
   })
 
   updateOpggBuildRecommendation(store.get('opggBuildRecommendation'))
+  updateOpggBanRecommendation(store.get('opggBuildRecommendation'))
   store.onChange('opggBuildRecommendation', updateOpggBuildRecommendation)
+  store.onChange('opggBuildRecommendation', updateOpggBanRecommendation)
 
   updateChampSelectCounterRecommendation(store.get('champSelectCounterRecommendation'))
   store.onChange('champSelectCounterRecommendation', updateChampSelectCounterRecommendation)

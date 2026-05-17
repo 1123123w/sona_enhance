@@ -51,6 +51,8 @@ export interface SonaConfig {
   champSelectAssist: boolean
   /** OP.GG 配装推荐（接管选好英雄后的技能预览面板点击） */
   opggBuildRecommendation: boolean
+  /** 锁定英雄后自动应用 OP.GG 推荐符文 */
+  opggAutoApplyRunes: boolean
   champSelectCounterRecommendation: boolean
   /** OP.GG 配装推荐段位过滤 */
   opggBuildRecommendationTier: string
@@ -136,6 +138,7 @@ const DEFAULT_CONFIG: SonaConfig = {
   windowEffect: 'none',
   champSelectAssist: false,
   opggBuildRecommendation: false,
+  opggAutoApplyRunes: false,
   champSelectCounterRecommendation: false,
   opggBuildRecommendationTier: 'emerald_plus',
   analyzeTeamPower: false,

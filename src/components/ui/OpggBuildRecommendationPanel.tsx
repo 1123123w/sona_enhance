@@ -21,6 +21,7 @@ import {
   getSpellName,
 } from '@/lib/assets'
 import { lcu } from '@/lib/lcu'
+import { applyOpggRunePage } from '@/lib/opgg-runes'
 import { type OpggItemBuild, type OpggMode, type OpggPosition, type OpggRuneBuild, type OpggTier } from '@/lib/opgg-api'
 import '@/styles/OpggBuildRecommendationPanel.css'
 
@@ -427,16 +428,7 @@ function RuneSection({ title, runes, championName }: { title: string; runes?: Op
     setApplyErrorKey('')
 
     try {
-      await lcu.applyRunePage({
-        name: championName,
-        primaryStyleId: rune.primary_page_id,
-        subStyleId: rune.secondary_page_id,
-        selectedPerkIds: [
-          ...rune.primary_rune_ids,
-          ...rune.secondary_rune_ids,
-          ...rune.stat_mod_ids,
-        ],
-      })
+      await applyOpggRunePage(rune, championName)
       setAppliedKey(key)
       try {
         await lcu.sendChampSelectMessage(`${championName} 符文已应用`, 'celebration')

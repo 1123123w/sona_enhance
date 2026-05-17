@@ -3,6 +3,8 @@ export type OpggMode = 'aram' | 'arena' | 'nexus_blitz' | 'urf' | 'ranked'
 export type OpggTier = 'all' | 'ibsg' | 'iron' | 'bronze' | 'silver' | 'gold' | 'gold_plus' | 'platinum' | 'platinum_plus' | 'emerald' | 'emerald_plus' | 'diamond' | 'diamond_plus' | 'master' | 'master_plus' | 'grandmaster' | 'challenger'
 export type OpggPosition = 'mid' | 'jungle' | 'adc' | 'top' | 'support' | 'all' | 'none'
 
+export const OPGG_DATA_REGION: OpggRegion = 'kr'
+
 export interface OpggVersions {
   data: string[]
 }

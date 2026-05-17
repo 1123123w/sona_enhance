@@ -5,6 +5,7 @@ import { injector } from '@/lib/InjectorManager'
 import { lcu, LcuEventUri, type ChampSelectSession, type LCUEventMessage } from '@/lib/lcu'
 import {
   OPGG_CACHE_CLEARED_EVENT,
+  OPGG_DATA_REGION,
   opggApi,
   type OpggRankedChampionsSummary,
   type OpggRankedDataItem,
@@ -159,7 +160,7 @@ async function ensureRankedSummary(): Promise<OpggRankedChampionsSummary> {
   if (rankedSummaryPromise) return rankedSummaryPromise
 
   rankedSummaryPromise = opggApi.getChampionsTier({
-    region: 'global',
+    region: OPGG_DATA_REGION,
     mode: 'ranked',
     tier,
   }) as Promise<OpggRankedChampionsSummary>

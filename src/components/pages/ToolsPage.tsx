@@ -111,6 +111,7 @@ export function ToolsPage() {
   const [windowEffect, setWindowEffect] = useState(store.get('windowEffect'))
   const [champSelectAssist, setChampSelectAssist] = useState(store.get('champSelectAssist'))
   const [opggBuildRecommendation, setOpggBuildRecommendation] = useState(store.get('opggBuildRecommendation'))
+  const [opggAutoApplyRunes, setOpggAutoApplyRunes] = useState(store.get('opggAutoApplyRunes'))
   const [champSelectCounterRecommendation, setChampSelectCounterRecommendation] = useState(store.get('champSelectCounterRecommendation'))
   const [balanceBuffTooltip, setBalanceBuffTooltip] = useState(store.get('balanceBuffTooltip'))
   const [champSelectQuitButton, setChampSelectQuitButton] = useState(store.get('champSelectQuitButton'))
@@ -165,6 +166,7 @@ export function ToolsPage() {
       store.onChange('windowEffect', setWindowEffect),
       store.onChange('champSelectAssist', setChampSelectAssist),
       store.onChange('opggBuildRecommendation', setOpggBuildRecommendation),
+      store.onChange('opggAutoApplyRunes', setOpggAutoApplyRunes),
       store.onChange('champSelectCounterRecommendation', setChampSelectCounterRecommendation),
       store.onChange('balanceBuffTooltip', setBalanceBuffTooltip),
       store.onChange('champSelectQuitButton', setChampSelectQuitButton),
@@ -388,8 +390,17 @@ export function ToolsPage() {
           />
         </SettingCard>
         <SettingCard
+          title="锁定后自动应用符文"
+          description="开启配装推荐后，锁定英雄时自动应用 OP.GG KR 推荐的第一套符文。"
+        >
+          <SonaSwitch
+            checked={opggAutoApplyRunes}
+            onChange={(v) => { setOpggAutoApplyRunes(v); store.set('opggAutoApplyRunes', v) }}
+          />
+        </SettingCard>
+        <SettingCard
           title="Counter 英雄推荐"
-          description="排位选人时，根据对方已选英雄，使用 OP.GG global ranked 数据推荐克制英雄。国服只用于读取当前选人。"
+          description="排位选人时，根据对方已选英雄，使用 OP.GG KR ranked 数据推荐克制英雄。国服只用于读取当前选人。"
         >
           <SonaSwitch
             checked={champSelectCounterRecommendation}

@@ -54,7 +54,7 @@ export function CounterRecommendationModal({
             {enemyChampionId > 0 && <img src={getChampionIcon(enemyChampionId)} alt="" />}
             <div>
               <div className="scrm-title">{enemyName}</div>
-              <div className="scrm-subtitle">{enemyLane} Counter 推荐 · OP.GG global ranked</div>
+              <div className="scrm-subtitle">{enemyLane} Counter 推荐 · OP.GG KR ranked</div>
             </div>
           </div>
         </header>
