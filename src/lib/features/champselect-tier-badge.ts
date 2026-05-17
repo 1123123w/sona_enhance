@@ -23,6 +23,7 @@ import tier5Icon from '@/../assets/tier/t5.svg'
 const BADGE_TARGETS = [
   { selector: '.champion-grid-champion-thumbnail', size: 22, left: -2, top: 0 },
   { selector: '.champion-card-component-click-target', size: 22, left: -2, top: 0 },
+  { selector: '.bench-champion-icon', size: 18, left: -2, top: -2 },
 ]
 const PLAYER_ICON_BADGE_TARGET = { size: 20, left: -2, top: 'auto', bottom: -2 }
 const BADGE_TARGET_SELECTOR = BADGE_TARGETS.map((target) => target.selector).join(',')
