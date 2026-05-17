@@ -569,10 +569,24 @@ function getManagedRuneKey(context: RecommendationContext): string {
   ].join('|')
 }
 
+function hasSavedSmartRunePage(context: RecommendationContext): boolean {
+  if (!store.get('smartBuildRecommendation')) return false
+
+  const runeKey = getSmartRuneKey(context)
+  if (!runeKey) return false
+
+  const saved = store.get('smartRunePages')[runeKey]
+  return Boolean(saved && isValidRunePage(saved))
+}
+
 function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
   if (!store.get('opggBuildRecommendation')) return
   if (!store.get('opggAutoApplyRunes')) return
   if (!currentChampionLocked) return
+  if (hasSavedSmartRunePage(entry.context)) {
+    logger.info('[OPGG] Auto rune skipped because a saved smart rune page exists')
+    return
+  }
 
   const syncKey = getManagedRuneKey(entry.context)
   if (lastAppliedRuneKey === syncKey || opggRuneSyncInFlightKeys.has(syncKey)) return
@@ -584,6 +598,10 @@ function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
       if (!currentChampionLocked) return
       if (!isCurrentRecommendationContext(entry.context)) return
       if (lastAppliedRuneKey === syncKey) return
+      if (hasSavedSmartRunePage(entry.context)) {
+        logger.info('[OPGG] Auto rune skipped because a saved smart rune page exists')
+        return
+      }
 
       const rune = recommendation.runePages[0]
       if (!rune) {
@@ -596,9 +614,6 @@ function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
       await applyOpggRunePage(rune, pageName)
       lastAppliedRuneKey = syncKey
       logger.info('[OPGG] 自动符文已应用：%s', championName)
-      lcu.sendChampSelectMessage(`${championName} 符文已自动应用 - Sona`, 'celebration').catch((err) => {
-        logger.warn('[OPGG] 自动符文本地提示发送失败:', err)
-      })
     })
     .catch((err) => {
       logger.warn('[OPGG] 自动符文应用失败:', err)
