@@ -51,8 +51,9 @@ const SELECTABLE_OPGG_TIERS: OpggTier[] = [
 const MIN_COUNTER_PLAY = 100
 const MAX_COUNTERS_PER_ENEMY = 8
 const MAX_SUGGESTIONS = 10
-const RANKED_QUEUE_IDS = new Set([420, 440])
+const CHAMP_SELECT_REARM_INTERVAL_MS = 1000
 const COUNTER_CLICK_ATTR = 'data-sona-counter-click'
+const COUNTER_CHAMPION_ATTR = 'data-sona-counter-champion-id'
 type CounterDataState = 'loading' | 'ready' | 'error'
 
 let phaseUnsub: (() => void) | null = null
@@ -68,6 +69,7 @@ let counterDataState: CounterDataState = 'loading'
 let counterDataMessage = ''
 let counterModalRoot: Root | null = null
 let counterModalContainer: HTMLDivElement | null = null
+let rearmTimer: number | null = null
 const boundEnemyIcons: Array<{ el: HTMLElement; handler: EventListener }> = []
 
 function normalizeOpggTier(value: string): OpggTier {
@@ -312,25 +314,57 @@ function cleanupEnemyIconBindings() {
   for (const { el, handler } of boundEnemyIcons) {
     el.removeEventListener('click', handler, true)
     el.removeAttribute(COUNTER_CLICK_ATTR)
+    el.removeAttribute(COUNTER_CHAMPION_ATTR)
     el.style.cursor = ''
     el.title = ''
   }
   boundEnemyIcons.length = 0
 }
 
+function cleanupEnemyIconBinding(el: HTMLElement) {
+  const index = boundEnemyIcons.findIndex((binding) => binding.el === el)
+  if (index < 0) return
+
+  const [binding] = boundEnemyIcons.splice(index, 1)
+  binding.el.removeEventListener('click', binding.handler, true)
+  binding.el.removeAttribute(COUNTER_CLICK_ATTR)
+  binding.el.removeAttribute(COUNTER_CHAMPION_ATTR)
+  binding.el.style.cursor = ''
+  binding.el.title = ''
+}
+
+function pruneDisconnectedEnemyIconBindings() {
+  for (let index = boundEnemyIcons.length - 1; index >= 0; index--) {
+    const binding = boundEnemyIcons[index]
+    if (binding.el.isConnected) continue
+
+    binding.el.removeEventListener('click', binding.handler, true)
+    binding.el.removeAttribute(COUNTER_CLICK_ATTR)
+    binding.el.removeAttribute(COUNTER_CHAMPION_ATTR)
+    boundEnemyIcons.splice(index, 1)
+  }
+}
+
 function tryBindEnemyCounterIcons(): boolean {
   if (!currentSession) return true
+
+  pruneDisconnectedEnemyIconBindings()
 
   const wrappers = document.querySelectorAll('.party.visible .summoner-wrapper.visible.right')
   if (wrappers.length === 0) return false
 
   wrappers.forEach((wrapper, index) => {
+    if (!(wrapper instanceof HTMLElement)) return
     const iconContainer = wrapper.querySelector('.champion-icon-container') as HTMLElement | null
-    if (!iconContainer || iconContainer.hasAttribute(COUNTER_CLICK_ATTR)) return
+    if (!iconContainer) return
 
     const enemy = currentSession?.theirTeam[index]
     const enemyChampionId = enemy ? getSelectedChampionId(enemy) : 0
     if (!enemy || enemyChampionId <= 0) return
+
+    const boundChampionId = Number(wrapper.getAttribute(COUNTER_CHAMPION_ATTR) || 0)
+    if (wrapper.hasAttribute(COUNTER_CLICK_ATTR) && boundChampionId === enemyChampionId) return
+    if (wrapper.hasAttribute(COUNTER_CLICK_ATTR)) cleanupEnemyIconBinding(wrapper)
 
     const laneLabel = getLaneLabel(mapAssignedPosition(enemy.assignedPosition))
     const handler = (event: Event) => {
@@ -343,11 +377,14 @@ function tryBindEnemyCounterIcons(): boolean {
       showCounterModal(enemyChampionId, laneLabel, suggestions)
     }
 
-    iconContainer.setAttribute(COUNTER_CLICK_ATTR, 'true')
+    wrapper.setAttribute(COUNTER_CLICK_ATTR, 'true')
+    wrapper.setAttribute(COUNTER_CHAMPION_ATTR, String(enemyChampionId))
+    wrapper.style.cursor = 'pointer'
+    wrapper.title = `${getChampionName(enemyChampionId)} Counter 鎺ㄨ崘`
     iconContainer.style.cursor = 'pointer'
     iconContainer.title = `${getChampionName(enemyChampionId)} Counter 推荐`
-    iconContainer.addEventListener('click', handler, true)
-    boundEnemyIcons.push({ el: iconContainer, handler })
+    wrapper.addEventListener('click', handler, true)
+    boundEnemyIcons.push({ el: wrapper, handler })
   })
 
   return true
@@ -358,6 +395,7 @@ function registerCounterInjection() {
     injector.register(tryBindEnemyCounterIcons)
     injectRegistered = true
   }
+  startRearmTimer()
 }
 
 function unregisterCounterInjection() {
@@ -365,15 +403,26 @@ function unregisterCounterInjection() {
     injector.unregister(tryBindEnemyCounterIcons)
     injectRegistered = false
   }
+  stopRearmTimer()
   cleanupEnemyIconBindings()
+}
+
+function startRearmTimer() {
+  if (rearmTimer != null) return
+
+  rearmTimer = window.setInterval(() => {
+    tryBindEnemyCounterIcons()
+  }, CHAMP_SELECT_REARM_INTERVAL_MS)
+}
+
+function stopRearmTimer() {
+  if (rearmTimer == null) return
+  window.clearInterval(rearmTimer)
+  rearmTimer = null
 }
 
 async function refreshCounterRecommendations(session: ChampSelectSession) {
   currentSession = session
-  if (!RANKED_QUEUE_IDS.has(session.queueId)) {
-    unregisterCounterInjection()
-    return
-  }
 
   registerCounterInjection()
   tryBindEnemyCounterIcons()
@@ -388,7 +437,6 @@ async function refreshCounterRecommendations(session: ChampSelectSession) {
   counterDataState = 'loading'
   counterDataMessage = ''
   suggestionsByEnemyId = new Map()
-  cleanupEnemyIconBindings()
   registerCounterInjection()
   tryBindEnemyCounterIcons()
 
@@ -399,14 +447,12 @@ async function refreshCounterRecommendations(session: ChampSelectSession) {
     counterDataState = 'ready'
     counterDataMessage = ''
 
-    cleanupEnemyIconBindings()
     registerCounterInjection()
     tryBindEnemyCounterIcons()
     logger.info('[CounterPick] Counter 推荐已准备: enemies=%d, global=%d', suggestionsByEnemyId.size, globalSuggestions.length)
   } catch (err) {
     counterDataState = 'error'
     counterDataMessage = err instanceof Error ? err.message : String(err)
-    cleanupEnemyIconBindings()
     registerCounterInjection()
     tryBindEnemyCounterIcons()
     logger.warn('[CounterPick] 生成 counter 建议失败:', err)
@@ -442,7 +488,9 @@ export function updateChampSelectCounterRecommendation(enabled: boolean) {
     phaseUnsub = lcu.observe(LcuEventUri.GAMEFLOW_PHASE_CHANGE, (event: LCUEventMessage) => {
       const phase = event.data as GameflowPhase
       if (phase === 'ChampSelect') {
-        mount()
+        lcu.getChampSelectSession()
+          .then((session) => mount(session))
+          .catch(() => mount())
       } else {
         unmount()
       }
@@ -455,7 +503,11 @@ export function updateChampSelectCounterRecommendation(enabled: boolean) {
     })
 
     lcu.getGameflowPhase().then((phase) => {
-      if (phase === 'ChampSelect') mount()
+      if (phase === 'ChampSelect') {
+        lcu.getChampSelectSession()
+          .then((session) => mount(session))
+          .catch(() => mount())
+      }
     }).catch(() => { /* ignore */ })
 
     logger.info('[CounterPick] 选人 counter 建议已启用')

@@ -6,10 +6,13 @@ import type { LCUEventMessage, GameflowPhase } from '@/lib/lcu'
 // ==================== 自动接受对局 ====================
 
 const AUTO_ACCEPT_MAX_DELAY_MS = 15000
+const READY_CHECK_POLL_INTERVAL_MS = 200
 
 let autoAcceptUnsub: (() => void) | null = null
 /** 记录当次 ReadyCheck 已调度的定时器，phase 离开 ReadyCheck 要清掉防止误触 */
 let autoAcceptTimer: ReturnType<typeof setTimeout> | null = null
+let readyCheckPollTimer: ReturnType<typeof setInterval> | null = null
+let autoAcceptToken = 0
 
 /**
  * 计算本次 accept 的延迟毫秒数：
@@ -37,17 +40,81 @@ function computeAcceptDelayMs(): number {
   return Math.round(minMs + Math.random() * (maxMs - minMs))
 }
 
-function scheduleAcceptMatch() {
-  // 清理可能残留的上次调度（防御性）
+function clearAutoAcceptTimer() {
+  autoAcceptToken++
+
   if (autoAcceptTimer) {
     clearTimeout(autoAcceptTimer)
     autoAcceptTimer = null
   }
 
-  const delayMs = computeAcceptDelayMs()
+  if (readyCheckPollTimer) {
+    clearInterval(readyCheckPollTimer)
+    readyCheckPollTimer = null
+  }
+}
 
-  const doAccept = () => {
+async function isReadyCheckAcceptable(): Promise<boolean> {
+  try {
+    const readyCheck = await lcu.getReadyCheck()
+    return readyCheck.state === 'InProgress' && readyCheck.playerResponse === 'None'
+  } catch (err) {
+    logger.warn('[AutoAccept] ReadyCheck 状态检查失败，取消本次自动接受: %o', err)
+    return false
+  }
+}
+
+function startReadyCheckPolling(token: number) {
+  if (readyCheckPollTimer) {
+    clearInterval(readyCheckPollTimer)
+    readyCheckPollTimer = null
+  }
+
+  readyCheckPollTimer = setInterval(() => {
+    if (token !== autoAcceptToken) return
+
+    lcu.getReadyCheck()
+      .then((readyCheck) => {
+        if (token !== autoAcceptToken) return
+
+        if (readyCheck.state !== 'InProgress' || readyCheck.playerResponse !== 'None') {
+          logger.info(
+            '[AutoAccept] ReadyCheck 已变化，取消本次自动接受: state=%s, response=%s',
+            readyCheck.state,
+            readyCheck.playerResponse,
+          )
+          clearAutoAcceptTimer()
+        }
+      })
+      .catch((err) => {
+        if (token !== autoAcceptToken) return
+        logger.warn('[AutoAccept] ReadyCheck 轮询失败，取消本次自动接受: %o', err)
+        clearAutoAcceptTimer()
+      })
+  }, READY_CHECK_POLL_INTERVAL_MS)
+}
+
+function scheduleAcceptMatch() {
+  // 清理可能残留的上次调度（防御性）
+  clearAutoAcceptTimer()
+
+  const delayMs = computeAcceptDelayMs()
+  const token = autoAcceptToken
+
+  const doAccept = async () => {
+    if (token !== autoAcceptToken) return
+
     autoAcceptTimer = null
+    if (readyCheckPollTimer) {
+      clearInterval(readyCheckPollTimer)
+      readyCheckPollTimer = null
+    }
+
+    if (!await isReadyCheckAcceptable()) {
+      logger.info('[AutoAccept] ReadyCheck 不再可接受，跳过本次自动接受')
+      return
+    }
+
     lcu.acceptMatch()
       .then(() => logger.info('Auto accepted match ✓ (delay=%dms)', delayMs))
       .catch((err) => logger.error('Auto accept failed:', err))
@@ -57,6 +124,7 @@ function scheduleAcceptMatch() {
     doAccept()
   } else {
     logger.info('[AutoAccept] 随机延迟 %dms 后接受', delayMs)
+    startReadyCheckPolling(token)
     autoAcceptTimer = setTimeout(doAccept, delayMs)
   }
 }
@@ -67,21 +135,17 @@ export function updateAutoAccept(enabled: boolean) {
       const phase = event.data as GameflowPhase
       if (phase === 'ReadyCheck') {
         scheduleAcceptMatch()
-      } else if (autoAcceptTimer) {
+      } else if (autoAcceptTimer || readyCheckPollTimer) {
         // ReadyCheck 窗口关闭（玩家手动拒绝 / 自动超时 / 队友拒绝）时清掉定时器，
         // 避免我们稍后的 accept 在"下一次 ReadyCheck 到来前"误触
-        clearTimeout(autoAcceptTimer)
-        autoAcceptTimer = null
+        clearAutoAcceptTimer()
       }
     })
     logger.info('Auto accept enabled ✓')
   } else if (!enabled && autoAcceptUnsub) {
     autoAcceptUnsub()
     autoAcceptUnsub = null
-    if (autoAcceptTimer) {
-      clearTimeout(autoAcceptTimer)
-      autoAcceptTimer = null
-    }
+    clearAutoAcceptTimer()
     logger.info('Auto accept disabled')
   }
 }

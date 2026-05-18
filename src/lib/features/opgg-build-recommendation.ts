@@ -44,6 +44,7 @@ const RUNE_PAGES_EVENT_URI = '/lol-perks/v1/pages'
 const RUNE_APPLY_SUPPRESS_MS = 1500
 const SPELL_APPLY_SUPPRESS_MS = 1500
 const SMART_LOADOUT_RESTORE_DEBOUNCE_MS = 500
+const CHAMP_SELECT_REARM_INTERVAL_MS = 1000
 const SELECTABLE_OPGG_TIERS: OpggTier[] = [
   'all',
   'challenger',
@@ -85,7 +86,9 @@ let currentContext: RecommendationContext = {
   gameMode: '',
   position: 'none',
 }
+let lastValidContext: RecommendationContext | null = null
 let currentChampionLocked = false
+let rearmTimer: number | null = null
 const boundElements: Array<{ el: HTMLElement; handler: EventListener; originalText: string }> = []
 const recommendationCache = new Map<string, RecommendationCacheEntry>()
 let outsideCloseHandler: ((event: MouseEvent) => void) | null = null
@@ -753,6 +756,7 @@ async function refreshContext(session?: ChampSelectSession) {
     )
 
     if (currentContext.championId > 0) {
+      lastValidContext = { ...currentContext }
       if (store.get('opggBuildRecommendation')) {
         mount()
       } else {
@@ -767,7 +771,7 @@ async function refreshContext(session?: ChampSelectSession) {
         syncSavedSmartLoadoutWhenReady(currentContext)
       }
     } else {
-      unmount(false)
+      mount()
     }
   } catch (err) {
     logger.warn('[OPGG] 刷新选人上下文失败:', err)
@@ -1098,7 +1102,7 @@ async function openRecommendationPanel(anchor: HTMLElement, contextOverride?: Re
     void refreshContext()
   }
 
-  const context = contextOverride ? { ...contextOverride } : { ...currentContext }
+  const context = contextOverride ? { ...contextOverride } : currentContext.championId > 0 ? { ...currentContext } : lastValidContext ? { ...lastValidContext } : { ...currentContext }
   const cacheEntry = ensureRecommendationPrefetch(context)
   const recommendation = cacheEntry?.data ?? null
   const loadError = cacheEntry?.error ?? ''
@@ -1271,7 +1275,11 @@ function tryHijackAbilityPreviewPanel(): boolean {
         closePanel()
         return
       }
-      openRecommendationPanel(target)
+      refreshContext()
+        .catch((err) => logger.warn('[OPGG] 点击入口时刷新选人上下文失败:', err))
+        .finally(() => {
+          openRecommendationPanel(target)
+        })
     }
 
     target.setAttribute(HIJACK_ATTR, 'true')
@@ -1291,6 +1299,21 @@ function mount() {
     injectRegistered = true
     logger.info('[OPGG] 已检测到本地英雄，开始接管技能预览入口')
   }
+  startRearmTimer()
+}
+
+function startRearmTimer() {
+  if (rearmTimer != null) return
+
+  rearmTimer = window.setInterval(() => {
+    tryHijackAbilityPreviewPanel()
+  }, CHAMP_SELECT_REARM_INTERVAL_MS)
+}
+
+function stopRearmTimer() {
+  if (rearmTimer == null) return
+  window.clearInterval(rearmTimer)
+  rearmTimer = null
 }
 
 function unmountPanel() {
@@ -1298,6 +1321,7 @@ function unmountPanel() {
     injector.unregister(tryHijackAbilityPreviewPanel)
     injectRegistered = false
   }
+  stopRearmTimer()
 
   for (const { el, handler, originalText } of boundElements) {
     el.removeEventListener('click', handler, true)
@@ -1319,6 +1343,7 @@ function unmount(resetContext = true) {
       gameMode: '',
       position: 'none',
     }
+    lastValidContext = null
   }
   currentChampionLocked = false
   lastAppliedItemSetKey = ''
@@ -1341,7 +1366,10 @@ export function updateOpggBuildRecommendation(enabled: boolean) {
   if (enabled && !phaseUnsub) {
     phaseUnsub = lcu.observe(LcuEventUri.GAMEFLOW_PHASE_CHANGE, (event: LCUEventMessage) => {
       const phase = event.data as GameflowPhase
-      if (phase !== 'ChampSelect') {
+      if (phase === 'ChampSelect') {
+        mount()
+        refreshContext()
+      } else {
         unmount()
       }
     })
@@ -1355,6 +1383,7 @@ export function updateOpggBuildRecommendation(enabled: boolean) {
 
     lcu.getGameflowPhase().then((phase) => {
       if (phase === 'ChampSelect') {
+        mount()
         refreshContext()
       }
     }).catch(() => { /* ignore */ })
@@ -1363,6 +1392,7 @@ export function updateOpggBuildRecommendation(enabled: boolean) {
   } else if (enabled && phaseUnsub) {
     lcu.getGameflowPhase().then((phase) => {
       if (phase === 'ChampSelect') {
+        mount()
         refreshContext()
       }
     }).catch(() => { /* ignore */ })
