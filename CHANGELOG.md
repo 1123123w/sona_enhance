@@ -1,3 +1,16 @@
+---
+## [1.3.2] - 2026-05-19
+
+### Fixed
+
+- Stabilized OP.GG build recommendation and Counter recommendation entry binding in champion select.
+- Fixed delayed auto-accept so a manual ReadyCheck decline cancels the pending automatic accept.
+
+### Changed
+
+- Unified plugin engineering namespace, build output, release package, runtime DOM/CSS prefixes, and DataStore namespace under `sonaenhance`.
+- Removed the temporary legacy `sona:` DataStore migration path after RC validation.
+
 # Changelog
 
 所有重要的版本变更都会记录在此文件中。
