@@ -5,6 +5,12 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
 ---
+## [1.3.2-rc.3] - 2026-05-19
+
+### Changed
+
+- Removed the temporary legacy `sona:` DataStore migration path; Sona-E now reads and writes only the `sonaenhance:` namespace.
+
 ## [1.3.2-rc.2] - 2026-05-19
 
 ### ?? ??

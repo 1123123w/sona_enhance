@@ -196,7 +196,6 @@ const DEFAULT_CONFIG: SonaConfig = {
 
 /** DataStore 键前缀，避免与其他插件冲突 */
 const KEY_PREFIX = 'sonaenhance:'
-const LEGACY_KEY_PREFIX = 'sona:'
 
 type ConfigKey = keyof SonaConfig
 type ChangeListener<K extends ConfigKey = ConfigKey> = (value: SonaConfig[K], key: K) => void
@@ -302,15 +301,8 @@ class SonaStore {
   // ---- 内部方法 ----
 
   private readFromDisk<K extends ConfigKey>(key: K): SonaConfig[K] {
-    const storageKey = `${KEY_PREFIX}${key}`
-    const stored = DataStore.get<SonaConfig[K]>(storageKey)
+    const stored = DataStore.get<SonaConfig[K]>(`${KEY_PREFIX}${key}`)
     if (stored !== undefined) return stored
-
-    const legacyStored = DataStore.get<SonaConfig[K]>(`${LEGACY_KEY_PREFIX}${key}`)
-    if (legacyStored !== undefined) {
-      DataStore.set(storageKey, legacyStored)
-      return legacyStored
-    }
 
     return DEFAULT_CONFIG[key]
   }
