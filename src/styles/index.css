@@ -2,9 +2,9 @@
 
 /* 
  * 不使用全屏覆盖，避免在 League Client CEF 环境中阻挡事件。
- * #sona-root 仅作为一个不影响布局的挂载点。
+ * #sonaenhance-root 仅作为一个不影响布局的挂载点。
  */
-#sona-root {
+#sonaenhance-root {
   position: fixed;
   bottom: 0;
   right: 0;
@@ -16,6 +16,6 @@
 }
 
 
-#sona-root * {
+#sonaenhance-root * {
   box-sizing: border-box;
 }

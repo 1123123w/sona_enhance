@@ -13,9 +13,9 @@ import { store } from '@/lib/store'
 import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 
-const BAN_BUTTON_ID = 'sona-opgg-ban-recommendation-button'
-const BAN_BUTTON_ATTR = 'data-sona-opgg-ban-button'
-const BAN_MODAL_ROOT_ID = 'sona-opgg-ban-recommendation-root'
+const BAN_BUTTON_ID = 'sonaenhance-opgg-ban-recommendation-button'
+const BAN_BUTTON_ATTR = 'data-sonaenhance-opgg-ban-button'
+const BAN_MODAL_ROOT_ID = 'sonaenhance-opgg-ban-recommendation-root'
 const DEFAULT_OPGG_TIER: OpggTier = 'emerald_plus'
 const MAX_BAN_ITEMS = 10
 const LANES: RankedBanLane[] = ['top', 'jungle', 'mid', 'adc', 'support']

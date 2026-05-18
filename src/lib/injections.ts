@@ -21,11 +21,11 @@ import { getPuuid } from '@/lib/assets'
 import { getUpdateState, onUpdateStateChange } from '@/lib/update-checker'
 
 /** 通用标记：标识已被 Sona 接管的 DOM 元素，防止重复绑定 */
-const HIJACKED_ATTR = 'data-sona-hijacked'
+const HIJACKED_ATTR = 'data-sonaenhance-hijacked'
 
 // ==================== Sona 入口按钮 ====================
 
-const BUTTON_ID = 'sona-entry-btn'
+const BUTTON_ID = 'sonaenhance-entry-btn'
 
 /**
  * 创建 Sona 入口按钮 DOM 元素
@@ -33,11 +33,11 @@ const BUTTON_ID = 'sona-entry-btn'
 function createEntryButton(): HTMLElement {
   const btn = document.createElement('div')
   btn.id = BUTTON_ID
-  btn.className = 'sona-entry-btn'
+  btn.className = 'sonaenhance-entry-btn'
 
   btn.innerHTML = `
-    <img class="sona-entry-icon" src="${sonaIcon}" alt="Sona" />
-    <span class="sona-entry-update-badge" aria-hidden="true">!</span>
+    <img class="sonaenhance-entry-icon" src="${sonaIcon}" alt="Sona" />
+    <span class="sonaenhance-entry-update-badge" aria-hidden="true">!</span>
   `
 
   // 防止客户端底层的 mousedown/mouseup 事件穿透
@@ -52,11 +52,11 @@ function createEntryButton(): HTMLElement {
 
   // 模态窗口关闭时同步 active 状态
   onModalVisibilityChange((visible) => {
-    btn.classList.toggle('sona-entry-btn--active', visible)
+    btn.classList.toggle('sonaenhance-entry-btn--active', visible)
   })
 
   const syncUpdateBadge = () => {
-    btn.classList.toggle('sona-entry-btn--has-update', getUpdateState().status === 'available')
+    btn.classList.toggle('sonaenhance-entry-btn--has-update', getUpdateState().status === 'available')
   }
   syncUpdateBadge()
   onUpdateStateChange(syncUpdateBadge)
@@ -87,7 +87,7 @@ function tryInjectSonaButton(): boolean {
 
 
 
-const MENU_ID = 'sona-availability-menu'
+const MENU_ID = 'sonaenhance-availability-menu'
 
 const AVAILABILITY_OPTIONS: { value: Availability; label: string }[] = [
   { value: 'chat', label: '在线' },
@@ -326,14 +326,14 @@ function showAvailabilityMenu(anchor: HTMLElement) {
 
   const menu = document.createElement('div')
   menu.id = MENU_ID
-  menu.className = 'sona-availability-menu'
+  menu.className = 'sonaenhance-availability-menu'
 
   for (const option of AVAILABILITY_OPTIONS) {
     const btn = document.createElement('button')
-    btn.className = `sona-availability-option${currentAvailability === option.value ? ' sona-availability-option--active' : ''}`
+    btn.className = `sonaenhance-availability-option${currentAvailability === option.value ? ' sonaenhance-availability-option--active' : ''}`
     btn.type = 'button'
     btn.innerHTML = `
-      <span class="sona-availability-dot sona-availability-dot--${option.value}"></span>
+      <span class="sonaenhance-availability-dot sonaenhance-availability-dot--${option.value}"></span>
       <span>${option.label}</span>
     `
 
@@ -458,7 +458,7 @@ export function setHideTFTEnabled(enabled: boolean) {
     injector.register(tryRemoveTFT)
   } else {
     injector.unregister(tryRemoveTFT)
-    // 恢复被隐藏的元素：移除 data-sona-hidden 标记，让元素重新显示
+    // 恢复被隐藏的元素：移除 data-sonaenhance-hidden 标记，让元素重新显示
     document.querySelectorAll(`[${HIJACKED_ATTR}-tft]`).forEach((el) => {
       (el as HTMLElement).style.display = ''
       el.removeAttribute(`${HIJACKED_ATTR}-tft`)

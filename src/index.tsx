@@ -20,7 +20,7 @@ import '@/styles/availabilityMenu.css'
 
 const PLUGIN_NAME = 'Sona-E'
 const PLUGIN_VERSION = __PLUGIN_VERSION__
-const CONTAINER_ID = 'sona-root'
+const CONTAINER_ID = 'sonaenhance-root'
 
 export const logger = createLogger({
   name: PLUGIN_NAME,
@@ -28,8 +28,8 @@ export const logger = createLogger({
 })
 
 function getRuntime(): SonaRuntime {
-  if (!window.__SONA_RUNTIME__) {
-    window.__SONA_RUNTIME__ = {
+  if (!window.__SONAENHANCE_RUNTIME__) {
+    window.__SONAENHANCE_RUNTIME__ = {
       container: null,
       root: null,
       hasShownStartupToast: false,
@@ -37,7 +37,7 @@ function getRuntime(): SonaRuntime {
     }
   }
 
-  return window.__SONA_RUNTIME__
+  return window.__SONAENHANCE_RUNTIME__
 }
 
 function appendContainer(container: HTMLDivElement) {
@@ -107,7 +107,7 @@ export function getContext(): PenguContext | null {
 
 /**
  * 容器守护注入任务
- * 检测 #sona-root 是否脱离 DOM，脱离则自动重新挂载
+ * 检测 #sonaenhance-root 是否脱离 DOM，脱离则自动重新挂载
  */
 function tryGuardContainer(): boolean {
   const runtime = getRuntime()

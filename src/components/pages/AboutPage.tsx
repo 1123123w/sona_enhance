@@ -26,21 +26,21 @@ export function AboutPage() {
   }
 
   return (
-    <div className="sona-about">
-      <div className="sona-about-header">
-        <h2 className="sona-about-title">Sona-E</h2>
-        <button type="button" className="sona-about-version" onClick={handleVersionClick}>
+    <div className="sonaenhance-about">
+      <div className="sonaenhance-about-header">
+        <h2 className="sonaenhance-about-title">Sona-E</h2>
+        <button type="button" className="sonaenhance-about-version" onClick={handleVersionClick}>
           v{__PLUGIN_VERSION__}
         </button>
       </div>
 
-      <p className="sona-about-desc">
+      <p className="sonaenhance-about-desc">
         {t('about.desc')}
       </p>
 
       {/* 信息卡片 + 技术栈 并排 */}
-      <div className="sona-about-row">
-        <div className="sona-about-cards">
+      <div className="sonaenhance-about-row">
+        <div className="sonaenhance-about-cards">
           <InfoCard icon={<ZapIcon />} label={t('about.plugin')} value={`Sona-E v${__PLUGIN_VERSION__}`} />
           <InfoCard icon={<CodeIcon />} label={t('about.framework')} value="React + Vite" />
           <InfoCard
@@ -50,32 +50,32 @@ export function AboutPage() {
           />
         </div>
 
-        <div className="sona-about-section sona-about-tech">
-          <h3 className="sona-about-section-title">{t('about.stack')}</h3>
-          <ul className="sona-about-list">
+        <div className="sonaenhance-about-section sonaenhance-about-tech">
+          <h3 className="sonaenhance-about-section-title">{t('about.stack')}</h3>
+          <ul className="sonaenhance-about-list">
             <li>React 19 + TypeScript</li>
             <li>Vite 6</li>
             <li>Pengu Loader v1.1.0+</li>
             <li>LCU REST API + WebSocket</li>
           </ul>
           <a
-            className="sona-hex-card sona-hex-card-link"
-            href="https://github.com/1123123w/sona"
+            className="sonaenhance-hex-card sonaenhance-hex-card-link"
+            href="https://github.com/1123123w/sona_enhance"
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="sona-hex-card-icon"><GitHubIcon /></span>
-            <div className="sona-hex-card-text">
-              <span className="sona-hex-card-label">GitHub</span>
-              <span className="sona-hex-card-value">1123123w/sona</span>
+            <span className="sonaenhance-hex-card-icon"><GitHubIcon /></span>
+            <div className="sonaenhance-hex-card-text">
+              <span className="sonaenhance-hex-card-label">GitHub</span>
+              <span className="sonaenhance-hex-card-value">1123123w/sona_enhance</span>
             </div>
           </a>
         </div>
       </div>
 
-      <div className="sona-about-section">
-        <h3 className="sona-about-section-title">{t('about.upstream')}</h3>
-        <p className="sona-about-text">
+      <div className="sonaenhance-about-section">
+        <h3 className="sonaenhance-about-section-title">{t('about.upstream')}</h3>
+        <p className="sonaenhance-about-text">
           {t('about.upstreamThanks')}{' '}
           <a href="https://github.com/WJZ-P" target="_blank" rel="noopener noreferrer">WJZ-P</a>
           {' / '}
@@ -83,12 +83,12 @@ export function AboutPage() {
         </p>
       </div>
 
-      <div className="sona-about-section">
-        <h3 className="sona-about-section-title">{t('about.license')}</h3>
-        <p className="sona-about-text">AGPL-3.0</p>
+      <div className="sonaenhance-about-section">
+        <h3 className="sonaenhance-about-section-title">{t('about.license')}</h3>
+        <p className="sonaenhance-about-text">AGPL-3.0</p>
       </div>
 
-      <div className="sona-about-quote">
+      <div className="sonaenhance-about-quote">
         {t('about.quote')}
       </div>
     </div>

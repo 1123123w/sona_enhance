@@ -208,10 +208,10 @@ import { createRoot, type Root } from 'react-dom/client'
 import { ChampSelectIconEffect, getTierConfig } from '@/components/ui/ChampSelectIconEffect'
 import { MatchHistoryModal } from '@/components/ui/MatchHistoryModal'
 
-const SONA_TIER_ATTR = 'data-sona-tier'
-const SONA_STATS_ATTR = 'data-sona-stats'
-const SONA_CLICK_ATTR = 'data-sona-click'
-const SONA_PLAYER_KEY_ATTR = 'data-sona-player-key'
+const SONA_TIER_ATTR = 'data-sonaenhance-tier'
+const SONA_STATS_ATTR = 'data-sonaenhance-stats'
+const SONA_CLICK_ATTR = 'data-sonaenhance-click'
+const SONA_PLAYER_KEY_ATTR = 'data-sonaenhance-player-key'
 
 /** 每个楼层的完整战绩缓存 */
 let floorStats: TeammateStats[] = []
@@ -246,7 +246,7 @@ let matchModalContainer: HTMLDivElement | null = null
 function showMatchHistoryModal(puuid: string, playerName: string, queueId?: number) {
   if (!matchModalContainer) {
     matchModalContainer = document.createElement('div')
-    matchModalContainer.id = 'sona-match-history-modal-root'
+    matchModalContainer.id = 'sonaenhance-match-history-modal-root'
     document.body.appendChild(matchModalContainer)
     matchModalRoot = createRoot(matchModalContainer)
   }
@@ -350,7 +350,7 @@ function tryInjectChampSelectTier(): boolean {
     iconContainer.setAttribute(SONA_PLAYER_KEY_ATTR, playerKey)
 
     // ---- 粒子特效 ----
-    if (!iconContainer.querySelector('[data-sona-particle]')) {
+    if (!iconContainer.querySelector('[data-sonaenhance-particle]')) {
       iconContainer.setAttribute(SONA_TIER_ATTR, 'true')
       iconContainer.style.position = 'relative'
       iconContainer.style.overflow = 'visible'
@@ -360,7 +360,7 @@ function tryInjectChampSelectTier(): boolean {
       if (config.boxShadow) iconContainer.style.boxShadow = config.boxShadow
 
       const mountDiv = document.createElement('div')
-      mountDiv.setAttribute('data-sona-particle', 'true')
+      mountDiv.setAttribute('data-sonaenhance-particle', 'true')
       iconContainer.prepend(mountDiv)
 
       const rect = iconContainer.getBoundingClientRect()

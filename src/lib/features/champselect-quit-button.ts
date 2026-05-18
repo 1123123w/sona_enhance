@@ -30,8 +30,8 @@ import { injector } from '@/lib/InjectorManager'
 
 const CONTAINER_SELECTOR = '.bottom-right-buttons'
 const NATIVE_QUIT_SELECTOR = '.quit-button'
-const SONA_QUIT_ATTR = 'data-sona-quit-button'
-const CONFIRM_OVERLAY_ID = 'sona-quit-confirm-overlay'
+const SONA_QUIT_ATTR = 'data-sonaenhance-quit-button'
+const CONFIRM_OVERLAY_ID = 'sonaenhance-quit-confirm-overlay'
 
 // ==================== 确认弹窗 ====================
 

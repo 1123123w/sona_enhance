@@ -1,6 +1,6 @@
 /* Sona Availability Menu - 在线状态选择菜单 */
 
-.sona-availability-menu {
+.sonaenhance-availability-menu {
   position: fixed;
   min-width: 100px;
   background: rgba(1, 10, 19, 0.97);
@@ -11,11 +11,11 @@
     0 0 12px rgba(200, 170, 110, 0.12);
   z-index: 821;
   overflow: hidden;
-  animation: sona-avail-menu-in 0.15s ease-out;
+  animation: sonaenhance-avail-menu-in 0.15s ease-out;
   pointer-events: auto;
 }
 
-@keyframes sona-avail-menu-in {
+@keyframes sonaenhance-avail-menu-in {
   from {
     opacity: 0;
     transform: translateY(-4px);
@@ -26,7 +26,7 @@
   }
 }
 
-.sona-availability-option {
+.sonaenhance-availability-option {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -44,32 +44,32 @@
   white-space: nowrap;
 }
 
-.sona-availability-option:hover {
+.sonaenhance-availability-option:hover {
   background: rgba(30, 35, 40, 0.8);
   color: #f0e6d2;
 }
 
-.sona-availability-option--active {
+.sonaenhance-availability-option--active {
   background: rgba(200, 170, 110, 0.15);
   color: #c8aa6e;
   border-left-color: #c8aa6e;
 }
 
-.sona-availability-option--active:hover {
+.sonaenhance-availability-option--active:hover {
   background: rgba(200, 170, 110, 0.2);
   color: #c8aa6e;
 }
 
 /* 状态圆点 */
-.sona-availability-dot {
+.sonaenhance-availability-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.sona-availability-dot--chat     { background: #43b581; box-shadow: 0 0 4px rgba(67, 181, 129, 0.6); }
-.sona-availability-dot--away     { background: #f04747; box-shadow: 0 0 4px rgba(240, 71, 71, 0.6);}
-.sona-availability-dot--dnd      { background: #faa61a; box-shadow: 0 0 4px rgba(250, 166, 26, 0.6);}
-.sona-availability-dot--offline  { background: #747f8d; box-shadow: none; }
-.sona-availability-dot--mobile   { background: #43b581; box-shadow: 0 0 4px rgba(67, 181, 129, 0.6); }
+.sonaenhance-availability-dot--chat     { background: #43b581; box-shadow: 0 0 4px rgba(67, 181, 129, 0.6); }
+.sonaenhance-availability-dot--away     { background: #f04747; box-shadow: 0 0 4px rgba(240, 71, 71, 0.6);}
+.sonaenhance-availability-dot--dnd      { background: #faa61a; box-shadow: 0 0 4px rgba(250, 166, 26, 0.6);}
+.sonaenhance-availability-dot--offline  { background: #747f8d; box-shadow: none; }
+.sonaenhance-availability-dot--mobile   { background: #43b581; box-shadow: 0 0 4px rgba(67, 181, 129, 0.6); }

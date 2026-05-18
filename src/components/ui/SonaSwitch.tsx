@@ -9,13 +9,13 @@ export interface SonaSwitchProps {
 export function SonaSwitch({ checked, onChange, disabled = false }: SonaSwitchProps) {
   return (
     <button
-      className={`sona-switch${checked ? ' sona-switch--on' : ''}${disabled ? ' sona-switch--disabled' : ''}`}
+      className={`sonaenhance-switch${checked ? ' sonaenhance-switch--on' : ''}${disabled ? ' sonaenhance-switch--disabled' : ''}`}
       onClick={() => !disabled && onChange(!checked)}
       type="button"
       role="switch"
       aria-checked={checked}
     >
-      <span className="sona-switch-thumb" />
+      <span className="sonaenhance-switch-thumb" />
     </button>
   )
 }

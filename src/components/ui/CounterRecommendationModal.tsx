@@ -65,7 +65,7 @@ export function CounterRecommendationModal({
   return createPortal(
     <div
       className="scrm-backdrop"
-      data-sona-counter-modal="true"
+      data-sonaenhance-counter-modal="true"
       onMouseDownCapture={(event) => {
         event.stopPropagation()
         if (event.target === event.currentTarget) onClose()

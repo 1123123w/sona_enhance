@@ -344,9 +344,9 @@ export class OpggApiError extends Error {
 
 type QueryParams = Record<string, string | number | boolean | null | undefined>
 
-const OPGG_CACHE_PREFIX = 'sona:opgg-cache:v1:'
+const OPGG_CACHE_PREFIX = 'sonaenhance:opgg-cache:v1:'
 const OPGG_CACHE_TTL_MS = 4 * 24 * 60 * 60 * 1000
-export const OPGG_CACHE_CLEARED_EVENT = 'sona:opgg-cache-cleared'
+export const OPGG_CACHE_CLEARED_EVENT = 'sonaenhance:opgg-cache-cleared'
 
 interface OpggCacheEnvelope<T> {
   cachedAt: number

@@ -3,7 +3,7 @@ import { injector } from '@/lib/InjectorManager'
 
 // ==================== 全局粒子美化效果 ====================
 
-const GLOBAL_CANVAS_ID = 'sona-global-particle-canvas'
+const GLOBAL_CANVAS_ID = 'sonaenhance-global-particle-canvas'
 
 /** 全局粒子的动画清理函数 */
 let globalParticleAnimCleanup: (() => void) | null = null

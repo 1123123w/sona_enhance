@@ -12,13 +12,13 @@ export interface SonaButtonProps {
 export function SonaButton({ children, variant = 'primary', onClick, disabled = false, style }: SonaButtonProps) {
   return (
     <button
-      className={`sona-btn sona-btn--${variant}${disabled ? ' sona-btn--disabled' : ''}`}
+      className={`sonaenhance-btn sonaenhance-btn--${variant}${disabled ? ' sonaenhance-btn--disabled' : ''}`}
       onClick={onClick}
       disabled={disabled}
       style={style}
       type="button"
     >
-      <span className="sona-btn-shine" />
+      <span className="sonaenhance-btn-shine" />
       {children}
     </button>
   )

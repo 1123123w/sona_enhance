@@ -20,31 +20,31 @@ export interface SidebarProps {
 export function Sidebar({ items, activeId, onSelect, collapsed, onToggle }: SidebarProps) {
   const { t } = useI18n()
   return (
-    <div className={`sona-sidebar${collapsed ? ' sona-sidebar--collapsed' : ''}`}>
+    <div className={`sonaenhance-sidebar${collapsed ? ' sonaenhance-sidebar--collapsed' : ''}`}>
       {/* Logo 区域 */}
-      <div className="sona-sidebar-logo">
-        <span className="sona-sidebar-logo-icon"><MusicIcon /></span>
-        {!collapsed && <span className="sona-sidebar-logo-text">Sona-E</span>}
+      <div className="sonaenhance-sidebar-logo">
+        <span className="sonaenhance-sidebar-logo-icon"><MusicIcon /></span>
+        {!collapsed && <span className="sonaenhance-sidebar-logo-text">Sona-E</span>}
       </div>
 
       {/* 导航项 */}
-      <nav className="sona-sidebar-nav">
+      <nav className="sonaenhance-sidebar-nav">
         {items.map((item) => (
           <button
             key={item.id}
-            className={`sona-sidebar-item${activeId === item.id ? ' sona-sidebar-item--active' : ''}`}
+            className={`sonaenhance-sidebar-item${activeId === item.id ? ' sonaenhance-sidebar-item--active' : ''}`}
             onClick={() => onSelect(item.id)}
             title={collapsed ? item.label : undefined}
           >
-            <span className="sona-sidebar-item-icon">{item.icon}</span>
-            {!collapsed && <span className="sona-sidebar-item-label">{item.label}</span>}
+            <span className="sonaenhance-sidebar-item-icon">{item.icon}</span>
+            {!collapsed && <span className="sonaenhance-sidebar-item-label">{item.label}</span>}
           </button>
         ))}
       </nav>
 
       {/* 底部展开/收缩按钮 */}
-      <div className="sona-sidebar-footer">
-        <button className="sona-sidebar-toggle" onClick={onToggle} title={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}>
+      <div className="sonaenhance-sidebar-footer">
+        <button className="sonaenhance-sidebar-toggle" onClick={onToggle} title={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}>
           {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </button>
       </div>

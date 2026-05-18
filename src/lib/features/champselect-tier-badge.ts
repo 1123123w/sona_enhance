@@ -27,8 +27,8 @@ const BADGE_TARGETS = [
 ]
 const PLAYER_ICON_BADGE_TARGET = { size: 20, left: -2, top: 'auto', bottom: -2 }
 const BADGE_TARGET_SELECTOR = BADGE_TARGETS.map((target) => target.selector).join(',')
-const BADGE_ATTR = 'data-sona-champ-tier-badge'
-const POSITION_ATTR = 'data-sona-original-position'
+const BADGE_ATTR = 'data-sonaenhance-champ-tier-badge'
+const POSITION_ATTR = 'data-sonaenhance-original-position'
 const DEFAULT_OPGG_TIER: OpggTier = 'emerald_plus'
 const SELECTABLE_OPGG_TIERS: OpggTier[] = [
   'all',

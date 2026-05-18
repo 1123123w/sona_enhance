@@ -6,8 +6,8 @@ import type { ChatFriend } from '@/lib/lcu'
 import { sleep } from '@/lib/utils'
 
 const FRIENDS_URI = '/lol-chat/v1/friends'
-const SONA_FRIEND_STATUS_ATTR = 'data-sona-enhanced-friend-status'
-const SONA_FRIEND_STATUS_ORIGINAL_ATTR = 'data-sona-enhanced-friend-status-original'
+const SONA_FRIEND_STATUS_ATTR = 'data-sonaenhance-enhanced-friend-status'
+const SONA_FRIEND_STATUS_ORIGINAL_ATTR = 'data-sonaenhance-enhanced-friend-status-original'
 
 interface EnhancedFriendStatusInfo {
   displayName: string

@@ -11,18 +11,18 @@ export function SonaSlider({ value, onChange, min = 0, max = 100 }: SonaSliderPr
   const percentage = ((value - min) / (max - min)) * 100
 
   return (
-    <div className="sona-slider">
+    <div className="sonaenhance-slider">
       <input
         type="range"
         min={min}
         max={max}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="sona-slider-input"
+        className="sonaenhance-slider-input"
       />
-      <div className="sona-slider-track" />
-      <div className="sona-slider-fill" style={{ width: `${percentage}%` }} />
-      <div className="sona-slider-thumb" style={{ left: `calc(${percentage}% - 6px)` }} />
+      <div className="sonaenhance-slider-track" />
+      <div className="sonaenhance-slider-fill" style={{ width: `${percentage}%` }} />
+      <div className="sonaenhance-slider-thumb" style={{ left: `calc(${percentage}% - 6px)` }} />
     </div>
   )
 }

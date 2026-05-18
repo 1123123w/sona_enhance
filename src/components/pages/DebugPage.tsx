@@ -286,11 +286,11 @@ export function DebugPage() {
   }
 
   return (
-    <div className="sona-settings">
-      <h2 className="sona-settings-title">调试面板</h2>
+    <div className="sonaenhance-settings">
+      <h2 className="sonaenhance-settings-title">调试面板</h2>
 
       <SettingGroup title="LCU API 测试">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('获取召唤师信息', () => lcu.getSummonerInfo())}>
             获取召唤师信息
           </SonaButton>
@@ -310,7 +310,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="英雄选择 (ARAM)">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('ARAM 重随', () => lcu.reroll())}>
             重随英雄
           </SonaButton>
@@ -341,8 +341,8 @@ export function DebugPage() {
           </SonaButton>
           */}
         </div>
-        <p className="sona-subtitle">点击选取共享池对应槽位的英雄</p>
-        <div className="sona-debug-actions">
+        <p className="sonaenhance-subtitle">点击选取共享池对应槽位的英雄</p>
+        <div className="sonaenhance-debug-actions">
           {Array.from({ length: 10 }, (_, i) => (
             <SonaButton key={i} style={{ minWidth: 40, padding: '6px 0' }} onClick={() => runAndLog(`Bench 换英雄 (槽位 ${i + 1})`, async () => {
               const bench = await lcu.getBenchChampions()
@@ -358,7 +358,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="信息查询">
-        <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={riotId}
@@ -377,7 +377,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="战绩查询">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton variant="primary" onClick={() => runAndLog('贪婪拉取 100 条战绩', async () => {
             const me = await lcu.getSummonerInfo()
             const puuid = me.puuid
@@ -393,7 +393,7 @@ export function DebugPage() {
             最近队友
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={puuid}
@@ -408,7 +408,7 @@ export function DebugPage() {
             查询战绩
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={gameId}
@@ -434,10 +434,10 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="SGP Token & 直连调试">
-        <p className="sona-subtitle">
+        <p className="sonaenhance-subtitle">
           测试从 LCU 获取 SGP 所需的 Token，并尝试直接请求 SGP 战绩接口。
         </p>
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton variant="primary" onClick={() => runAndLog('Entitlements Token', () => lcu.getEntitlementsToken())}>
             获取 Entitlements Token
           </SonaButton>
@@ -448,7 +448,7 @@ export function DebugPage() {
             解析 SGP Server ID
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8 }}>
           <SonaButton onClick={() => runAndLog('SGP 直连: 自己战绩', async () => {
             const [tokenRes, me, sgpServerId] = await Promise.all([
               lcu.getEntitlementsToken(),
@@ -496,10 +496,10 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="OP.GG API 连通性">
-        <p className="sona-subtitle">
+        <p className="sonaenhance-subtitle">
           使用 Akari 同款数据源测试浏览器环境能否直连 OP.GG Champion API。
         </p>
-        <div className="sona-debug-actions" style={{ alignItems: 'center', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ alignItems: 'center', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={corsTestUrl}
@@ -511,7 +511,7 @@ export function DebugPage() {
             GET 测试
           </SonaButton>
         </div>
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton variant="primary" onClick={() => runAndLog('OP.GG 版本接口连通性', testOpggConnectivity)}>
             测试 OP.GG API
           </SonaButton>
@@ -526,7 +526,7 @@ export function DebugPage() {
             ranked 列表
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8 }}>
           <SonaButton onClick={() => runAndLog('OP.GG 单英雄 ranked', async () => {
             const id = await getOpggDebugChampionId()
             return fetchOpggJson(`/api/${OPGG_DATA_REGION}/champions/ranked/${id}/mid`, { tier: 'platinum_plus' })
@@ -594,14 +594,14 @@ export function DebugPage() {
             拉起 ranked 面板
           </SonaButton>
         </div>
-        <p className="sona-subtitle">单英雄接口和面板预览优先使用「游戏资源」里选择的英雄；未选择时尝试当前选人英雄，最后用兰博 68 兜底。</p>
+        <p className="sonaenhance-subtitle">单英雄接口和面板预览优先使用「游戏资源」里选择的英雄；未选择时尝试当前选人英雄，最后用兰博 68 兜底。</p>
       </SettingGroup>
 
       <SettingGroup title="聊天调试">
-        <p className="sona-subtitle">
+        <p className="sonaenhance-subtitle">
           向当前英雄选择聊天框发送指定类型的消息。celebration / system / information 仅自己可见，chat 所有人可见。
         </p>
-        <div className="sona-debug-actions" style={{ gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={chatMsg}
@@ -626,11 +626,11 @@ export function DebugPage() {
             发送
           </SonaButton>
         </div>
-        <p className="sona-subtitle">字数: {chatMsg.length}</p>
+        <p className="sonaenhance-subtitle">字数: {chatMsg.length}</p>
       </SettingGroup>
 
       <SettingGroup title="客户端操作">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => window.openDevTools()}>
             打开 DevTools
           </SonaButton>
@@ -647,7 +647,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="游戏资源">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('物品列表 (items.json)', () => lcu.getItems())}>
             物品图标
           </SonaButton>
@@ -658,7 +658,7 @@ export function DebugPage() {
             英雄摘要数据
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8, alignItems: 'flex-start', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8, alignItems: 'flex-start', gap: 8 }}>
           <div style={{ flex: 1, position: 'relative' }} ref={champRef}>
             <SonaInput
               value={champSearch}
@@ -671,11 +671,11 @@ export function DebugPage() {
               placeholder="搜索英雄 (名字/称号/英文名)"
             />
             {showChampSuggestions && champSuggestions.length > 0 && (
-              <div className="sona-champ-suggest">
+              <div className="sonaenhance-champ-suggest">
                 {champSuggestions.map((c) => (
                   <button
                     key={c.id}
-                    className="sona-champ-suggest-item"
+                    className="sonaenhance-champ-suggest-item"
                     type="button"
                     onClick={() => {
                       setChampSearch(`${c.title} ${c.name}`)
@@ -683,9 +683,9 @@ export function DebugPage() {
                       setShowChampSuggestions(false)
                     }}
                   >
-                    <img className="sona-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
-                    <span className="sona-champ-suggest-title">{c.title}</span>
-                    <span className="sona-champ-suggest-name">{c.name}</span>
+                    <img className="sonaenhance-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
+                    <span className="sonaenhance-champ-suggest-title">{c.title}</span>
+                    <span className="sonaenhance-champ-suggest-name">{c.name}</span>
                   </button>
                 ))}
               </div>
@@ -700,7 +700,7 @@ export function DebugPage() {
             查询完整数据
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8 }}>
           <SonaButton onClick={() => runAndLog('符文列表 (perks.json)', () => lcu.getPerks())}>
             符文列表
           </SonaButton>
@@ -714,7 +714,7 @@ export function DebugPage() {
             好友列表
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8 }}>
           <SonaButton onClick={() => runAndLog('队列列表 (queues)', () => lcu.getQueues())}>
             队列列表
           </SonaButton>
@@ -731,7 +731,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="回放调试">
-        <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={gameId}
@@ -780,7 +780,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="荣誉 & 点赞">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('荣誉选票 (ballot)', async () => {
             const res = await fetch('/lol-honor-v2/v1/ballot'); return res.json()
           })}>
@@ -823,7 +823,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="房间 & 组队">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('房间信息 (lobby)', async () => {
             const res = await fetch('/lol-lobby/v2/lobby'); return res.json()
           })}>
@@ -840,7 +840,7 @@ export function DebugPage() {
             邀请列表
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={lobbyQueueId}
@@ -859,7 +859,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="头像框 & 头像">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('Regalia v2', () => lcu.getRegalia())}>
             查看 Regalia
           </SonaButton>
@@ -882,7 +882,7 @@ export function DebugPage() {
 
 
       <SettingGroup title="生涯背景">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('summoner-profile', async () => {
             const res = await fetch('/lol-summoner/v1/current-summoner/summoner-profile'); return res.json()
           })}>
@@ -906,7 +906,7 @@ export function DebugPage() {
             皮肤库存
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8, alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={skinId}
@@ -932,7 +932,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="客户端配置">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('常规设置 (game-settings)', () => lcu.getGameSettings())}>
             常规设置
           </SonaButton>
@@ -951,7 +951,7 @@ export function DebugPage() {
       </SettingGroup>
 
       <SettingGroup title="区域 & 炫彩">
-        <div className="sona-debug-actions">
+        <div className="sonaenhance-debug-actions">
           <SonaButton onClick={() => runAndLog('区域语言', async () => {
             const res = await fetch('/riotclient/region-locale'); return res.json()
           })}>
@@ -968,7 +968,7 @@ export function DebugPage() {
             功能开关
           </SonaButton>
         </div>
-        <div className="sona-debug-actions" style={{ marginTop: 8 }}>
+        <div className="sonaenhance-debug-actions" style={{ marginTop: 8 }}>
           <SonaButton onClick={() => runAndLog('配置命名空间', async () => {
             const res = await fetch('/lol-platform-config/v3/namespaces'); return res.json()
           })}>
@@ -1002,7 +1002,7 @@ export function DebugPage() {
 
       {/* 输出区 */}
       {output && (
-        <div className="sona-debug-output">
+        <div className="sonaenhance-debug-output">
           <pre>{output}</pre>
         </div>
       )}

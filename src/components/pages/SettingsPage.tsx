@@ -63,7 +63,7 @@ function BackupManager() {
 
   return (
     <>
-      <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
+      <div className="sonaenhance-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
         <div style={{ flex: 1 }}>
           <SonaInput
             value={backupName}
@@ -76,16 +76,16 @@ function BackupManager() {
           {t('settings.backup.save')}
         </SonaButton>
       </div>
-      {status && <p className="sona-subtitle" style={{ marginTop: 6 }}>{status}</p>}
+      {status && <p className="sonaenhance-subtitle" style={{ marginTop: 6 }}>{status}</p>}
       {backups.length > 0 && (
         <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
           {backups.map((b) => (
-            <div key={b.name} className="sona-backup-item">
-              <div className="sona-backup-info">
-                <span className="sona-backup-name">{b.name}</span>
-                <span className="sona-backup-time">{formatTime(b.timestamp)}</span>
+            <div key={b.name} className="sonaenhance-backup-item">
+              <div className="sonaenhance-backup-info">
+                <span className="sonaenhance-backup-name">{b.name}</span>
+                <span className="sonaenhance-backup-time">{formatTime(b.timestamp)}</span>
               </div>
-              <div className="sona-backup-actions">
+              <div className="sonaenhance-backup-actions">
                 <SonaButton onClick={() => handleRestore(b.name)}>{t('settings.backup.restore')}</SonaButton>
                 <SonaButton onClick={() => handleDelete(b.name)}>{t('settings.backup.delete')}</SonaButton>
               </div>
@@ -138,8 +138,8 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="sona-settings">
-      <h2 className="sona-settings-title">{t('settings.title')}</h2>
+    <div className="sonaenhance-settings">
+      <h2 className="sonaenhance-settings-title">{t('settings.title')}</h2>
 
       <SettingGroup title={t('settings.general')}>
         <SettingCard
@@ -207,7 +207,7 @@ export function SettingsPage() {
       </SettingGroup>
 
       <SettingGroup title={t('settings.backup')}>
-        <p className="sona-subtitle" style={{ marginBottom: 10 }}>{t('settings.backup.desc')}</p>
+        <p className="sonaenhance-subtitle" style={{ marginBottom: 10 }}>{t('settings.backup.desc')}</p>
         <BackupManager />
       </SettingGroup>
 
@@ -223,7 +223,7 @@ export function SettingsPage() {
             }}>
               {t('settings.clear')}
             </SonaButton>
-            {opggCacheStatus && <span className="sona-subtitle">{opggCacheStatus}</span>}
+            {opggCacheStatus && <span className="sonaenhance-subtitle">{opggCacheStatus}</span>}
           </div>
         </SettingCard>
       </SettingGroup>

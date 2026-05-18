@@ -5,8 +5,8 @@ import { sleep } from '@/lib/utils'
 
 // ==================== 好友智能分组 ====================
 
-const SONA_FRIEND_GROUP_ATTR = 'data-sona-friend-group'
-const SONA_FRIEND_CHECKED_ATTR = 'data-sona-friend-checked'
+const SONA_FRIEND_GROUP_ATTR = 'data-sonaenhance-friend-group'
+const SONA_FRIEND_CHECKED_ATTR = 'data-sonaenhance-friend-checked'
 const FRIENDS_URI = '/lol-chat/v1/friends'
 
 /** 用于给同一对局分配相同颜色 */

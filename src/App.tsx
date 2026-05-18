@@ -44,7 +44,7 @@ export function App() {
 
   useEffect(() => {
     return onModalVisibilityChange((v) => {
-      const rootConnected = Boolean(document.getElementById('sona-root')?.isConnected)
+      const rootConnected = Boolean(document.getElementById('sonaenhance-root')?.isConnected)
       logger.debug('Modal visibility changed: %s (root in DOM: %s)', String(v), String(rootConnected))
       setVisible(v)
       if (v && getUpdateState().status === 'available') {
@@ -109,7 +109,7 @@ export function App() {
       width={900}
       height={560}
     >
-      <div className="sona-layout">
+      <div className="sonaenhance-layout">
         <Sidebar
           items={sidebarItems}
           activeId={activePageId}
@@ -117,7 +117,7 @@ export function App() {
           collapsed={sidebarCollapsed}
           onToggle={handleToggleSidebar}
         />
-        <div className="sona-content">
+        <div className="sonaenhance-content">
           <PageContent pageId={activePageId} />
         </div>
       </div>

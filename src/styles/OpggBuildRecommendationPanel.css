@@ -129,12 +129,12 @@
   font-size: 15px;
 }
 
-.sobp-tier-filter .sona-select {
+.sobp-tier-filter .sonaenhance-select {
   width: 135px;
   z-index: 20;
 }
 
-.sobp-tier-filter .sona-select-trigger {
+.sobp-tier-filter .sonaenhance-select-trigger {
   height: 30px;
   padding: 0 8px 0 10px;
   border-color: rgb(200 170 110 / 36%);
@@ -143,16 +143,16 @@
   font-weight: 700;
 }
 
-.sobp-tier-filter .sona-select-dropdown {
+.sobp-tier-filter .sonaenhance-select-dropdown {
   z-index: 30;
 }
 
-.sobp-tier-filter .sona-select-option {
+.sobp-tier-filter .sonaenhance-select-option {
   padding: 8px 10px;
   font-size: 13px;
 }
 
-.sobp-tier-filter .sona-select-icon {
+.sobp-tier-filter .sonaenhance-select-icon {
   width: 16px;
   height: 16px;
 }

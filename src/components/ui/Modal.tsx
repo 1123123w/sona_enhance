@@ -180,8 +180,8 @@ export function Modal({
     height: typeof height === 'number' ? `${height}px` : height,
   }
 
-  const overlayClass = `sona-modal-overlay${closing ? ' sona-modal-closing' : ''}`
-  const dialogClass = `sona-modal-dialog${closing ? ' sona-modal-closing' : ''}`
+  const overlayClass = `sonaenhance-modal-overlay${closing ? ' sonaenhance-modal-closing' : ''}`
+  const dialogClass = `sonaenhance-modal-dialog${closing ? ' sonaenhance-modal-closing' : ''}`
 
   return createPortal(
     <div
@@ -200,22 +200,22 @@ export function Modal({
         {/* Canvas 粒子背景 */}
         <canvas
           ref={canvasRef}
-          className="sona-modal-particle-canvas"
+          className="sonaenhance-modal-particle-canvas"
         />
         {/* 关闭按钮（悬浮右上角） */}
         {closable && (
-          <button className="sona-modal-close" onClick={onClose} title="Close">
+          <button className="sonaenhance-modal-close" onClick={onClose} title="Close">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
         )}
         {/* Body */}
-        <div className="sona-modal-body">
+        <div className="sonaenhance-modal-body">
           {children}
         </div>
       </div>
     </div>,
-    document.getElementById('sona-root') || document.body,
+    document.getElementById('sonaenhance-root') || document.body,
   )
 }

@@ -15,7 +15,7 @@ let gameAnalysisContainer: HTMLDivElement | null = null
 function showGameAnalysisModal() {
   if (!gameAnalysisContainer) {
     gameAnalysisContainer = document.createElement('div')
-    gameAnalysisContainer.id = 'sona-game-analysis-root'
+    gameAnalysisContainer.id = 'sonaenhance-game-analysis-root'
     document.body.appendChild(gameAnalysisContainer)
     gameAnalysisRoot = createRoot(gameAnalysisContainer)
   }
@@ -45,7 +45,7 @@ function cleanupGameAnalysisModal() {
 
 // ---- 客户端内嵌按钮 ----
 
-const GAME_ANALYSIS_BTN_ATTR = 'data-sona-game-analysis'
+const GAME_ANALYSIS_BTN_ATTR = 'data-sonaenhance-game-analysis'
 
 /**
  * 注入任务：在 game-in-progress-container 中注入"对局分析"按钮

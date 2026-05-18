@@ -52,8 +52,8 @@ const MIN_COUNTER_PLAY = 100
 const MAX_COUNTERS_PER_ENEMY = 8
 const MAX_SUGGESTIONS = 10
 const CHAMP_SELECT_REARM_INTERVAL_MS = 1000
-const COUNTER_CLICK_ATTR = 'data-sona-counter-click'
-const COUNTER_CHAMPION_ATTR = 'data-sona-counter-champion-id'
+const COUNTER_CLICK_ATTR = 'data-sonaenhance-counter-click'
+const COUNTER_CHAMPION_ATTR = 'data-sonaenhance-counter-champion-id'
 type CounterDataState = 'loading' | 'ready' | 'error'
 
 let phaseUnsub: (() => void) | null = null
@@ -268,7 +268,7 @@ function getCounterMessage(enemyChampionId: number, suggestions: CounterSuggesti
 function showCounterModal(enemyChampionId: number, enemyLane: string, suggestions: CounterSuggestion[]) {
   if (!counterModalContainer) {
     counterModalContainer = document.createElement('div')
-    counterModalContainer.id = 'sona-counter-recommendation-modal-root'
+    counterModalContainer.id = 'sonaenhance-counter-recommendation-modal-root'
     document.body.appendChild(counterModalContainer)
     counterModalRoot = createRoot(counterModalContainer)
   }

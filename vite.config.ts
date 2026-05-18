@@ -43,26 +43,26 @@ function penguServe(): Plugin {
           `  window.$RefreshSig$ = () => (type) => type;`,
           `  window.__vite_plugin_react_preamble_installed__ = true;`,
           `}).catch(e => {`,
-          `  console.error("[Sona] Failed to install react preamble:", e);`,
+          `  console.error("[Sona-E] Failed to install react preamble:", e);`,
           `  throw e;`,
           `});`,
           `const viteClient = reactPreamble.then(() => import("https://localhost:${port}/@vite/client")).catch(e => {`,
-          `  console.error("[Sona] Failed to load vite client:", e);`,
+          `  console.error("[Sona-E] Failed to load vite client:", e);`,
           `  throw e;`,
           `});`,
           `const pluginModule = () => viteClient.then(() => import("https://localhost:${port}/src/index.tsx")).catch(e => {`,
-          `  console.error("[Sona] Failed to load plugin module:", e);`,
+          `  console.error("[Sona-E] Failed to load plugin module:", e);`,
           `  throw e;`,
           `});`,
           ``,
           `export function init(context) {`,
-          `//  console.log("[Sona] init called");`,
-          `  pluginModule().then(m => m.init(context)).catch(e => console.error("[Sona] init error:", e));`,
+          `//  console.log("[Sona-E] init called");`,
+          `  pluginModule().then(m => m.init(context)).catch(e => console.error("[Sona-E] init error:", e));`,
           `}`,
           ``,
           `export function load() {`,
-          `//  console.log("[Sona] load called");`,
-          `  pluginModule().then(m => m.load?.()).catch(e => console.error("[Sona] load error:", e));`,
+          `//  console.log("[Sona-E] load called");`,
+          `  pluginModule().then(m => m.load?.()).catch(e => console.error("[Sona-E] load error:", e));`,
           `}`,
         ].join('\n')
 
@@ -111,7 +111,7 @@ function penguBuild(): Plugin {
       if (fs.existsSync(jsPath)) {
         let js = fs.readFileSync(jsPath, 'utf-8')
 
-        // Fix asset paths: /assets/ -> //plugins/sona/assets/
+        // Fix asset paths: /assets/ -> //plugins/sonaenhance/assets/
         js = js.replaceAll('"/assets/', `"//plugins/${PLUGIN_NAME}/assets/`)
         js = js.replaceAll("'/assets/", `'//plugins/${PLUGIN_NAME}/assets/`)
 
@@ -121,11 +121,11 @@ function penguBuild(): Plugin {
         // Pengu Loader 插件头注释（识别插件元信息用）
         const banner = [
           '/**',
-          ' * @name Sona',
+          ' * @name Sona-E',
           ` * @version ${pkg.version}`,
           ' * @description 基于 Pengu Loader 的全服可用英雄联盟客户端增强插件',
-          ' * @author WJZ_P',
-          ' * @link https://github.com/WJZ-P/sona',
+          ' * @author WJZ_P / 1123123w',
+          ' * @link https://github.com/1123123w/sona_enhance',
           ' */',
           '',
         ].join('\n')

@@ -588,7 +588,7 @@ let matchModalContainer: HTMLDivElement | null = null
 function showMatchHistoryModal(puuid: string, playerName: string, queueId?: number) {
   if (!matchModalContainer) {
     matchModalContainer = document.createElement('div')
-    matchModalContainer.id = 'sona-game-analysis-match-modal-root'
+    matchModalContainer.id = 'sonaenhance-game-analysis-match-modal-root'
     document.body.appendChild(matchModalContainer)
     matchModalRoot = createRoot(matchModalContainer)
   }

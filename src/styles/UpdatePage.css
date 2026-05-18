@@ -1,10 +1,10 @@
-.sona-update-page {
+.sonaenhance-update-page {
   min-height: 100%;
   padding: 32px;
   box-sizing: border-box;
 }
 
-.sona-update-title {
+.sonaenhance-update-title {
   margin: 0 0 12px;
   color: #f0e6d2;
   font-size: 20px;
@@ -13,24 +13,24 @@
   text-shadow: 0 0 8px rgba(46, 204, 113, 0.22);
 }
 
-.sona-update-title-version {
+.sonaenhance-update-title-version {
   color: #a09b8c;
   font-weight: 800;
 }
 
-.sona-update-title-version--latest {
+.sonaenhance-update-title-version--latest {
   color: #2ecc71;
 }
 
-.sona-update-title-arrow {
+.sonaenhance-update-title-arrow {
   margin: 0 8px;
   color: #c8aa6e;
   font-weight: 800;
 }
 
-.sona-update-release,
-.sona-update-download,
-.sona-update-empty {
+.sonaenhance-update-release,
+.sonaenhance-update-download,
+.sonaenhance-update-empty {
   margin-top: 14px;
   padding: 16px;
   border: 1px solid rgba(200, 170, 110, 0.16);
@@ -38,7 +38,7 @@
   background: rgba(30, 35, 40, 0.42);
 }
 
-.sona-update-release-head {
+.sonaenhance-update-release-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -49,13 +49,13 @@
   font-weight: 700;
 }
 
-.sona-update-release-head time {
+.sonaenhance-update-release-head time {
   color: #785a28;
   font-size: 11px;
   font-weight: 500;
 }
 
-.sona-update-notes {
+.sonaenhance-update-notes {
   margin: 0;
   color: #cdbe91;
   font-family: inherit;
@@ -64,21 +64,21 @@
   white-space: pre-wrap;
 }
 
-.sona-update-download h3 {
+.sonaenhance-update-download h3 {
   margin: 0 0 8px;
   color: #f0e6d2;
   font-size: 15px;
 }
 
-.sona-update-download p,
-.sona-update-empty p {
+.sonaenhance-update-download p,
+.sonaenhance-update-empty p {
   margin: 0 0 14px;
   color: #a09b8c;
   font-size: 13px;
   line-height: 1.7;
 }
 
-.sona-update-actions {
+.sonaenhance-update-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;

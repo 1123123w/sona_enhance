@@ -1,6 +1,6 @@
 /* Sona Input - 海克斯风格输入框 */
 
-.sona-input {
+.sonaenhance-input {
   display: flex;
   align-items: center;
   width: 100%;
@@ -9,16 +9,16 @@
   transition: all 0.3s ease;
 }
 
-.sona-input:hover {
+.sonaenhance-input:hover {
   border-bottom-color: #785a28;
 }
 
-.sona-input--focused {
+.sonaenhance-input--focused {
   border-bottom-color: #c8aa6e;
   box-shadow: 0 2px 10px -2px rgba(200, 170, 110, 0.3);
 }
 
-.sona-input-icon {
+.sonaenhance-input-icon {
   display: flex;
   align-items: center;
   margin-left: 12px;
@@ -27,11 +27,11 @@
   flex-shrink: 0;
 }
 
-.sona-input--focused .sona-input-icon {
+.sonaenhance-input--focused .sonaenhance-input-icon {
   color: #c8aa6e;
 }
 
-.sona-input-field {
+.sonaenhance-input-field {
   width: 100%;
   background: transparent;
   border: none;
@@ -42,6 +42,6 @@
   outline: none;
 }
 
-.sona-input-field::placeholder {
+.sonaenhance-input-field::placeholder {
   color: rgba(160, 155, 140, 0.5);
 }

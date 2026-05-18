@@ -1,6 +1,6 @@
 /* Sona Slider - 海克斯风格滑动条 */
 
-.sona-slider {
+.sonaenhance-slider {
   position: relative;
   width: 100%;
   height: 28px;
@@ -9,7 +9,7 @@
 }
 
 /* 隐藏原生 input，但保留交互 */
-.sona-slider-input {
+.sonaenhance-slider-input {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -20,7 +20,7 @@
 }
 
 /* 轨道 */
-.sona-slider-track {
+.sonaenhance-slider-track {
   position: absolute;
   width: 100%;
   height: 4px;
@@ -29,7 +29,7 @@
 }
 
 /* 填充 */
-.sona-slider-fill {
+.sonaenhance-slider-fill {
   position: absolute;
   height: 4px;
   background: #c8aa6e;
@@ -39,7 +39,7 @@
 }
 
 /* 滑块 */
-.sona-slider-thumb {
+.sonaenhance-slider-thumb {
   position: absolute;
   width: 12px;
   height: 16px;
@@ -51,10 +51,10 @@
   pointer-events: none;
 }
 
-.sona-slider:hover .sona-slider-thumb {
+.sonaenhance-slider:hover .sonaenhance-slider-thumb {
   transform: scaleY(1.1);
 }
 
-.sona-slider:active .sona-slider-thumb {
+.sonaenhance-slider:active .sonaenhance-slider-thumb {
   transform: scaleY(0.95);
 }

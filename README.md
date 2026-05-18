@@ -1,8 +1,8 @@
 # Sona-E 自用增强版 / Personal Enhanced Edition
 
-这是基于 [WJZ-P/sona](https://github.com/WJZ-P/sona) 维护的个人自用 fork，当前公开仓库为 [1123123w/sona](https://github.com/1123123w/sona)。
+这是基于 [WJZ-P/sona](https://github.com/WJZ-P/sona) 维护的个人自用 fork，当前公开仓库为 [1123123w/sona_enhance](https://github.com/1123123w/sona_enhance)。
 
-This is a personal fork based on [WJZ-P/sona](https://github.com/WJZ-P/sona). The public fork is [1123123w/sona](https://github.com/1123123w/sona).
+This is a personal fork based on [WJZ-P/sona](https://github.com/WJZ-P/sona). The public fork is [1123123w/sona_enhance](https://github.com/1123123w/sona_enhance).
 
 目标不是替代原项目，而是在持续吸收原版实用功能的基础上，保留更适合国服环境和个人使用习惯的改动。后续同步原版时优先吸收功能思路，不直接照搬原版文案、设置位置、默认值或 README。
 

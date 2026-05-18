@@ -8,9 +8,9 @@ import type { LCUEventMessage, Lobby } from '@/lib/lcu'
 import { calculateSonaPlayerStrengthScore } from '@/lib/player-strength-score'
 import { store } from '@/lib/store'
 
-const SONA_LOBBY_HISTORY_ATTR = 'data-sona-lobby-history'
-const SONA_LOBBY_STATS_ATTR = 'data-sona-lobby-stats'
-const SONA_LOBBY_STATS_TEXT_ATTR = 'data-sona-lobby-stats-text'
+const SONA_LOBBY_HISTORY_ATTR = 'data-sonaenhance-lobby-history'
+const SONA_LOBBY_STATS_ATTR = 'data-sonaenhance-lobby-stats'
+const SONA_LOBBY_STATS_TEXT_ATTR = 'data-sonaenhance-lobby-stats-text'
 const INTERACTIVE_SELECTOR = [
   'button',
   'a',
@@ -59,7 +59,7 @@ let matchModalContainer: HTMLDivElement | null = null
 function showMatchHistoryModal(puuid: string, playerName: string, queueId?: number) {
   if (!matchModalContainer) {
     matchModalContainer = document.createElement('div')
-    matchModalContainer.id = 'sona-lobby-member-match-history-root'
+    matchModalContainer.id = 'sonaenhance-lobby-member-match-history-root'
     document.body.appendChild(matchModalContainer)
     matchModalRoot = createRoot(matchModalContainer)
   }

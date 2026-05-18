@@ -26,9 +26,9 @@ export interface UpdateState {
   error: string
 }
 
-const RELEASE_PAGE_URL = 'https://github.com/1123123w/sona/releases'
-const GITHUB_API_LATEST = 'https://api.github.com/repos/1123123w/sona/releases/latest'
-const GITHUB_API_RELEASES = 'https://api.github.com/repos/1123123w/sona/releases'
+const RELEASE_PAGE_URL = 'https://github.com/1123123w/sona_enhance/releases'
+const GITHUB_API_LATEST = 'https://api.github.com/repos/1123123w/sona_enhance/releases/latest'
+const GITHUB_API_RELEASES = 'https://api.github.com/repos/1123123w/sona_enhance/releases'
 
 function wrapCorsProxy(targetUrl: string): string {
   return `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`

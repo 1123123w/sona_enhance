@@ -1203,7 +1203,7 @@ class LCUManager {
       titleKey: 'pre_translated_title',
       backgroundUrl: '',
       data: { title, details },
-      iconUrl: '/lol-game-data/assets/v1/profile-icons/3867.jpg',// https://heimerdinger.lol/index.php/icon/sona-champie-icon-5s8jq
+      iconUrl: '/lol-game-data/assets/v1/profile-icons/3867.jpg',// https://heimerdinger.lol/index.php/icon/sonaenhance-champie-icon-5s8jq
       source: 'sona',
       state: 'toast',
       type: 'string',

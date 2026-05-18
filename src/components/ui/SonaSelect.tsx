@@ -33,35 +33,35 @@ export function SonaSelect({ options, value, onChange, placeholder }: SonaSelect
   }, [])
 
   return (
-    <div className="sona-select" ref={dropdownRef}>
+    <div className="sonaenhance-select" ref={dropdownRef}>
       <button
-        className={`sona-select-trigger${isOpen ? ' sona-select-trigger--open' : ''}`}
+        className={`sonaenhance-select-trigger${isOpen ? ' sonaenhance-select-trigger--open' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         type="button"
       >
-        <span className="sona-select-value">
-          {selectedOption?.icon && <img className="sona-select-icon" src={selectedOption.icon} alt="" />}
+        <span className="sonaenhance-select-value">
+          {selectedOption?.icon && <img className="sonaenhance-select-icon" src={selectedOption.icon} alt="" />}
           {selectedOption ? selectedOption.label : (placeholder ?? t('select.placeholder'))}
         </span>
-        <svg className={`sona-select-arrow${isOpen ? ' sona-select-arrow--open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className={`sonaenhance-select-arrow${isOpen ? ' sonaenhance-select-arrow--open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="sona-select-dropdown">
+        <div className="sonaenhance-select-dropdown">
           {options.map((option) => (
             <button
               key={option.value}
-              className={`sona-select-option${value === option.value ? ' sona-select-option--active' : ''}`}
+              className={`sonaenhance-select-option${value === option.value ? ' sonaenhance-select-option--active' : ''}`}
               onClick={() => {
                 onChange(option.value)
                 setIsOpen(false)
               }}
               type="button"
             >
-              <span className="sona-select-option-label">
-                {option.icon && <img className="sona-select-icon" src={option.icon} alt="" />}
+              <span className="sonaenhance-select-option-label">
+                {option.icon && <img className="sonaenhance-select-icon" src={option.icon} alt="" />}
                 {option.label}
               </span>
               {value === option.value && (

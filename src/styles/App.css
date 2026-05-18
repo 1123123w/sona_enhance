@@ -1,13 +1,13 @@
 /* Sona Plugin - App-level Styles */
 
 /* ---- 主布局：侧边栏 + 内容区 ---- */
-.sona-layout {
+.sonaenhance-layout {
   display: flex;
   height: 100%;
   overflow: hidden;
 }
 
-.sona-content {
+.sonaenhance-content {
   position: relative;
   flex: 1;
   overflow: auto;
@@ -15,25 +15,25 @@
 }
 
 /* 自定义滚动条 */
-.sona-content::-webkit-scrollbar {
+.sonaenhance-content::-webkit-scrollbar {
   width: 6px;
 }
 
-.sona-content::-webkit-scrollbar-track {
+.sonaenhance-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.sona-content::-webkit-scrollbar-thumb {
+.sonaenhance-content::-webkit-scrollbar-thumb {
   background: rgba(200, 170, 110, 0.2);
   border-radius: 3px;
 }
 
-.sona-content::-webkit-scrollbar-thumb:hover {
+.sonaenhance-content::-webkit-scrollbar-thumb:hover {
   background: rgba(200, 170, 110, 0.35);
 }
 
 /* ---- 占位页面 ---- */
-.sona-page-placeholder {
+.sonaenhance-page-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,17 +44,17 @@
 }
 
 /* ---- Modal 标题图标（保留兼容） ---- */
-.sona-modal-title-inner {
+.sonaenhance-modal-title-inner {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.sona-title-icon {
-  animation: sona-pulse 2s ease-in-out infinite;
+.sonaenhance-title-icon {
+  animation: sonaenhance-pulse 2s ease-in-out infinite;
 }
 
-@keyframes sona-pulse {
+@keyframes sonaenhance-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }

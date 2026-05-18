@@ -34,8 +34,8 @@ import {
 import type { GameflowPhase } from '@/types/lcu'
 
 const TARGET_SELECTOR = '.toggle-ability-previews-button'
-const HIJACK_ATTR = 'data-sona-opgg-build-hijacked'
-const PANEL_ID = 'sona-opgg-build-panel'
+const HIJACK_ATTR = 'data-sonaenhance-opgg-build-hijacked'
+const PANEL_ID = 'sonaenhance-opgg-build-panel'
 const DEFAULT_OPGG_TIER: OpggTier = 'master_plus'
 const SONA_ITEM_SET_TITLE_PREFIX = '[Sona-E]'
 const HEALTH_POTION_ID = 2003
@@ -377,7 +377,7 @@ function buildItemSetBlocks(recommendation: BuildRecommendation): ItemSetBlock[]
 }
 
 function getManagedItemSetUid(context: RecommendationContext): string {
-  return `sona-${context.championId}`
+  return `sonaenhance-${context.championId}`
 }
 
 function getChampionName(championId: number): string {
@@ -1185,7 +1185,7 @@ async function openRecommendationPanel(anchor: HTMLElement, contextOverride?: Re
 
   outsideCloseHandler = (event: MouseEvent) => {
     const target = event.target as Node
-    if (target instanceof Element && target.closest('[data-sona-counter-modal="true"]')) return
+    if (target instanceof Element && target.closest('[data-sonaenhance-counter-modal="true"]')) return
     if (!root.contains(target) && !anchor.contains(target)) {
       closePanel()
     }

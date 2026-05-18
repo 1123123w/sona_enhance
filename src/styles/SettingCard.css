@@ -1,11 +1,11 @@
 /* Sona Setting Card & Group Styles */
 
 /* ---- 设置分组 ---- */
-.sona-setting-group {
+.sonaenhance-setting-group {
   margin-bottom: 28px;
 }
 
-.sona-setting-group-title {
+.sonaenhance-setting-group-title {
   margin: 0 0 14px 0;
   padding-bottom: 8px;
   font-size: 15px;
@@ -17,14 +17,14 @@
   text-shadow: 0 0 3px rgba(200, 170, 110, 0.4);
 }
 
-.sona-setting-group-list {
+.sonaenhance-setting-group-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 /* ---- 设置卡片 ---- */
-.sona-setting-card {
+.sonaenhance-setting-card {
   position: relative;
   z-index: 1;
   display: flex;
@@ -38,7 +38,7 @@
   cursor: default;
 }
 
-.sona-setting-card:hover {
+.sonaenhance-setting-card:hover {
   z-index: 2;
   background: rgba(9, 20, 40, 0.8);
   border-color: rgba(200, 170, 110, 0.5);
@@ -49,17 +49,17 @@
 }
 
 /* 包含下拉菜单的卡片，展开时层级最高 */
-.sona-setting-card:has(.sona-select-dropdown) {
+.sonaenhance-setting-card:has(.sonaenhance-select-dropdown) {
   z-index: 200;
 }
 
-.sona-setting-card-info {
+.sonaenhance-setting-card-info {
   flex: 1;
   padding-right: 20px;
   min-width: 0;
 }
 
-.sona-setting-card-title {
+.sonaenhance-setting-card-title {
   margin: 0 0 4px 0;
   font-size: 13px;
   font-weight: 500;
@@ -68,18 +68,18 @@
   transition: color 0.2s ease;
 }
 
-.sona-setting-card:hover .sona-setting-card-title {
+.sonaenhance-setting-card:hover .sonaenhance-setting-card-title {
   color: #c8aa6e;
 }
 
-.sona-setting-card-desc {
+.sonaenhance-setting-card-desc {
   margin: 0;
   font-size: 11px;
   color: #a09b8c;
   line-height: 1.6;
 }
 
-.sona-setting-card-action {
+.sonaenhance-setting-card-action {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -89,7 +89,7 @@
 }
 
 /* ---- 通用小标题/说明文字 ---- */
-.sona-subtitle {
+.sonaenhance-subtitle {
   margin: 8px 0 4px;
   font-size: 11px;
   color: #a09b8c;

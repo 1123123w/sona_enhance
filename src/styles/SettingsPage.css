@@ -1,29 +1,29 @@
 /* Sona Settings Page */
 
-.sona-settings {
+.sonaenhance-settings {
   padding: 32px;
   height: 100%;
   overflow-y: auto;
 }
 
-.sona-settings::-webkit-scrollbar {
+.sonaenhance-settings::-webkit-scrollbar {
   width: 6px;
 }
 
-.sona-settings::-webkit-scrollbar-track {
+.sonaenhance-settings::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.sona-settings::-webkit-scrollbar-thumb {
+.sonaenhance-settings::-webkit-scrollbar-thumb {
   background: rgba(200, 170, 110, 0.2);
   border-radius: 3px;
 }
 
-.sona-settings::-webkit-scrollbar-thumb:hover {
+.sonaenhance-settings::-webkit-scrollbar-thumb:hover {
   background: rgba(200, 170, 110, 0.35);
 }
 
-.sona-settings-title {
+.sonaenhance-settings-title {
   margin: 0 0 28px 0;
   font-size: 22px;
   font-weight: 700;
@@ -32,7 +32,7 @@
   text-shadow: 0 0 8px rgba(200, 170, 110, 0.2);
 }
 
-.sona-tool-nav {
+.sonaenhance-tool-nav {
   position: sticky;
   top: 0;
   z-index: 20;
@@ -45,7 +45,7 @@
   backdrop-filter: blur(10px);
 }
 
-.sona-tool-nav button {
+.sonaenhance-tool-nav button {
   padding: 6px 10px;
   border: 1px solid rgba(200, 170, 110, 0.18);
   border-radius: 4px;
@@ -57,25 +57,25 @@
   transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
-.sona-tool-nav button:hover {
+.sonaenhance-tool-nav button:hover {
   border-color: rgba(200, 170, 110, 0.42);
   background: rgba(70, 55, 30, 0.44);
   color: #f0e6d2;
 }
 
-.sona-tool-section {
+.sonaenhance-tool-section {
   scroll-margin-top: 58px;
 }
 
 /* ---- 调试页按钮行 ---- */
-.sona-debug-actions {
+.sonaenhance-debug-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
 /* ---- 调试输出区 ---- */
-.sona-debug-output {
+.sonaenhance-debug-output {
   margin-top: 20px;
   padding: 16px;
   background: rgba(1, 10, 19, 0.6);
@@ -85,20 +85,20 @@
   overflow: auto;
 }
 
-.sona-debug-output::-webkit-scrollbar {
+.sonaenhance-debug-output::-webkit-scrollbar {
   width: 6px;
 }
 
-.sona-debug-output::-webkit-scrollbar-track {
+.sonaenhance-debug-output::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.sona-debug-output::-webkit-scrollbar-thumb {
+.sonaenhance-debug-output::-webkit-scrollbar-thumb {
   background: rgba(200, 170, 110, 0.2);
   border-radius: 3px;
 }
 
-.sona-debug-output pre {
+.sonaenhance-debug-output pre {
   margin: 0;
   font-size: 11px;
   font-family: 'Consolas', 'Monaco', monospace;
@@ -109,7 +109,7 @@
 }
 
 /* ---- 英雄联想下拉 ---- */
-.sona-champ-suggest {
+.sonaenhance-champ-suggest {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -122,10 +122,10 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
-.sona-champ-suggest::-webkit-scrollbar { width: 4px; }
-.sona-champ-suggest::-webkit-scrollbar-thumb { background: #3c2e16; border-radius: 2px; }
+.sonaenhance-champ-suggest::-webkit-scrollbar { width: 4px; }
+.sonaenhance-champ-suggest::-webkit-scrollbar-thumb { background: #3c2e16; border-radius: 2px; }
 
-.sona-champ-suggest-item {
+.sonaenhance-champ-suggest-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -140,11 +140,11 @@
   transition: background 0.15s;
 }
 
-.sona-champ-suggest-item:hover {
+.sonaenhance-champ-suggest-item:hover {
   background: rgba(200, 170, 110, 0.1);
 }
 
-.sona-champ-suggest-icon {
+.sonaenhance-champ-suggest-icon {
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -153,23 +153,23 @@
   flex-shrink: 0;
 }
 
-.sona-champ-suggest-title {
+.sonaenhance-champ-suggest-title {
   color: #c8aa6e;
   font-weight: 600;
 }
 
-.sona-champ-suggest-name {
+.sonaenhance-champ-suggest-name {
   color: #a09b8c;
 }
 
 /* ---- 英雄优先级队列 ---- */
-.sona-champ-priority-list {
+.sonaenhance-champ-priority-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.sona-champ-priority-card {
+.sonaenhance-champ-priority-card {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -182,13 +182,13 @@
   transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 
-.sona-champ-priority-card:hover {
+.sonaenhance-champ-priority-card:hover {
   transform: translateX(4px);
   border-color: rgba(200, 170, 110, 0.28);
   background: rgba(30, 35, 40, 0.58);
 }
 
-.sona-champ-priority-index {
+.sonaenhance-champ-priority-index {
   min-width: 18px;
   height: 18px;
   border-radius: 3px;
@@ -200,7 +200,7 @@
   font-weight: 700;
 }
 
-.sona-champ-priority-icon {
+.sonaenhance-champ-priority-icon {
   width: 30px;
   height: 30px;
   border-radius: 3px;
@@ -208,7 +208,7 @@
   border: 1px solid rgba(200, 170, 110, 0.3);
 }
 
-.sona-champ-priority-name {
+.sonaenhance-champ-priority-name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -216,7 +216,7 @@
   font-size: 12px;
 }
 
-.sona-champ-priority-remove {
+.sonaenhance-champ-priority-remove {
   width: 22px;
   height: 22px;
   padding: 0;
@@ -229,14 +229,14 @@
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-.sona-champ-priority-remove:hover {
+.sonaenhance-champ-priority-remove:hover {
   background: rgba(190, 64, 64, 0.28);
   border-color: rgba(190, 64, 64, 0.45);
   color: #f0e6d2;
 }
 
 /* ---- 设置备份列表 ---- */
-.sona-backup-item {
+.sonaenhance-backup-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -247,28 +247,28 @@
   transition: border-color 0.2s;
 }
 
-.sona-backup-item:hover {
+.sonaenhance-backup-item:hover {
   border-color: rgba(200, 170, 110, 0.25);
 }
 
-.sona-backup-info {
+.sonaenhance-backup-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.sona-backup-name {
+.sonaenhance-backup-name {
   font-size: 13px;
   font-weight: 600;
   color: #f0e6d2;
 }
 
-.sona-backup-time {
+.sonaenhance-backup-time {
   font-size: 11px;
   color: #785a28;
 }
 
-.sona-backup-actions {
+.sonaenhance-backup-actions {
   display: flex;
   gap: 6px;
 }

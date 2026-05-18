@@ -14,8 +14,8 @@ export function SonaInput({ value, onChange, placeholder, icon, type = 'text', o
   const [isFocused, setIsFocused] = useState(false)
 
   return (
-    <div className={`sona-input${isFocused ? ' sona-input--focused' : ''}`}>
-      {icon && <span className="sona-input-icon">{icon}</span>}
+    <div className={`sonaenhance-input${isFocused ? ' sonaenhance-input--focused' : ''}`}>
+      {icon && <span className="sonaenhance-input-icon">{icon}</span>}
       <input
         type={type}
         value={value}
@@ -24,7 +24,7 @@ export function SonaInput({ value, onChange, placeholder, icon, type = 'text', o
         placeholder={placeholder}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        className="sona-input-field"
+        className="sonaenhance-input-field"
       />
     </div>
   )

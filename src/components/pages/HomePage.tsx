@@ -115,7 +115,7 @@ function ParticleCanvas() {
     }
   }, [])
 
-  return <canvas ref={canvasRef} className="sona-home-particle-canvas" />
+  return <canvas ref={canvasRef} className="sonaenhance-home-particle-canvas" />
 }
 
 export function HomePage() {
@@ -214,18 +214,18 @@ export function HomePage() {
   }
 
   return (
-    <div className="sona-home">
+    <div className="sonaenhance-home">
       {/* SONA 标题 */}
-      <h1 className="sona-home-brand">
-        <span className="sona-home-brand-text">SONA-E</span>
+      <h1 className="sonaenhance-home-brand">
+        <span className="sonaenhance-home-brand-text">SONA-E</span>
       </h1>
 
       {/* 头像 + 粒子 */}
-      <div className="sona-home-avatar-wrap">
+      <div className="sonaenhance-home-avatar-wrap">
         <ParticleCanvas />
-        <div className="sona-home-avatar-glow" />
+        <div className="sonaenhance-home-avatar-glow" />
         <img
-          className="sona-home-avatar"
+          className="sonaenhance-home-avatar"
           src={sonaIcon}
           alt="Sona-E"
           draggable={false}
@@ -233,16 +233,16 @@ export function HomePage() {
       </div>
 
       {/* 欢迎语 */}
-      <div className="sona-home-welcome">
-        <h2 className="sona-home-heading">{t('home.welcome')}</h2>
-        <p className="sona-home-subtitle">
+      <div className="sonaenhance-home-welcome">
+        <h2 className="sonaenhance-home-heading">{t('home.welcome')}</h2>
+        <p className="sonaenhance-home-subtitle">
           {t('home.subtitle')}
         </p>
       </div>
 
-      <section className="sona-home-search">
-        <p className="sona-home-search-title">{t('home.matchTitle')}</p>
-        <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
+      <section className="sonaenhance-home-search">
+        <p className="sonaenhance-home-search-title">{t('home.matchTitle')}</p>
+        <div className="sonaenhance-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={searchRiotId}
@@ -255,13 +255,13 @@ export function HomePage() {
             {t('home.search')}
           </SonaButton>
         </div>
-        {searchError && <p className="sona-home-search-error">{searchError}</p>}
+        {searchError && <p className="sonaenhance-home-search-error">{searchError}</p>}
       </section>
 
-      <section className="sona-home-search">
-        <p className="sona-home-search-title">{t('home.replayTitle')}</p>
-        <p className="sona-home-search-hint">{t('home.replayHint')}</p>
-        <div className="sona-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
+      <section className="sonaenhance-home-search">
+        <p className="sonaenhance-home-search-title">{t('home.replayTitle')}</p>
+        <p className="sonaenhance-home-search-hint">{t('home.replayHint')}</p>
+        <div className="sonaenhance-debug-actions" style={{ alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1 }}>
             <SonaInput
               value={replayGameId}
@@ -283,7 +283,7 @@ export function HomePage() {
       />
 
       {/* 琴女语录 */}
-      <p className="sona-home-quote">
+      <p className="sonaenhance-home-quote">
         {t('home.quote')}
         <br />
         &nbsp;{t('home.quoteAuthor')}

@@ -4,7 +4,7 @@ import { injector } from '@/lib/InjectorManager'
 
 // ==================== 大乱斗无CD换英雄 ====================
 
-const BENCH_HIJACK_ATTR = 'data-sona-bench-hijacked'
+const BENCH_HIJACK_ATTR = 'data-sonaenhance-bench-hijacked'
 
 /**
  * 从 champion-bench-item 的 background-image 中提取英雄 ID

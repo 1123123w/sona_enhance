@@ -55,7 +55,7 @@ declare global {
     /** Gets the current script path */
     getScriptPath(): string
     /** Sona plugin runtime state */
-    __SONA_RUNTIME__?: SonaRuntime
+    __SONAENHANCE_RUNTIME__?: SonaRuntime
   }
 
   /** Pengu Loader namespace */

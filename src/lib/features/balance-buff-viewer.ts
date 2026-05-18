@@ -264,7 +264,7 @@ function buildTooltipData(champId: number): { caption: string; content: string }
 
 // ==================== DOM 绑定（幂等） ====================
 
-const BOUND_ATTR = 'data-sona-balance-hover'
+const BOUND_ATTR = 'data-sonaenhance-balance-hover'
 
 /**
  * 从 summoner-container-wrapper 中提取英雄 ID

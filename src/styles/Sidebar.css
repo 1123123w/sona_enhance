@@ -1,6 +1,6 @@
 /* Sona Sidebar Styles */
 
-.sona-sidebar {
+.sonaenhance-sidebar {
   position: relative;
   z-index: 2;
   display: flex;
@@ -13,12 +13,12 @@
   overflow: hidden;
 }
 
-.sona-sidebar--collapsed {
+.sonaenhance-sidebar--collapsed {
   width: 48px;
 }
 
 /* ---- Logo 区域 ---- */
-.sona-sidebar-logo {
+.sonaenhance-sidebar-logo {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -28,7 +28,7 @@
   min-height: 47px;
 }
 
-.sona-sidebar-logo-icon {
+.sonaenhance-sidebar-logo-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +38,7 @@
   height: 20px;
 }
 
-.sona-sidebar-logo-text {
+.sonaenhance-sidebar-logo-text {
   font-size: 15px;
   font-weight: 600;
   color: #c8aa6e;
@@ -47,7 +47,7 @@
 }
 
 /* ---- 导航列表 ---- */
-.sona-sidebar-nav {
+.sonaenhance-sidebar-nav {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -59,12 +59,12 @@
 }
 
 /* 隐藏滚动条 */
-.sona-sidebar-nav::-webkit-scrollbar {
+.sonaenhance-sidebar-nav::-webkit-scrollbar {
   width: 0;
 }
 
 /* ---- 导航项 ---- */
-.sona-sidebar-item {
+.sonaenhance-sidebar-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -82,10 +82,10 @@
   white-space: nowrap;
   width: 100%;
   text-align: left;
-  animation: sona-sidebar-item-in 0.25s ease-out both;
+  animation: sonaenhance-sidebar-item-in 0.25s ease-out both;
 }
 
-@keyframes sona-sidebar-item-in {
+@keyframes sonaenhance-sidebar-item-in {
   from {
     opacity: 0;
     transform: translateX(-8px);
@@ -96,25 +96,25 @@
   }
 }
 
-.sona-sidebar-item:hover {
+.sonaenhance-sidebar-item:hover {
   color: #f0e6d2;
   background: rgba(200, 170, 110, 0.08);
   border-color: rgba(200, 170, 110, 0.12);
 }
 
-.sona-sidebar-item--active {
+.sonaenhance-sidebar-item--active {
   color: #c8aa6e;
   background: rgba(200, 170, 110, 0.12);
   border-color: rgba(200, 170, 110, 0.25);
   box-shadow: inset 2px 0 0 #c8aa6e;
 }
 
-.sona-sidebar-item--active:hover {
+.sonaenhance-sidebar-item--active:hover {
   color: #c8aa6e;
   background: rgba(200, 170, 110, 0.16);
 }
 
-.sona-sidebar-item-icon {
+.sonaenhance-sidebar-item-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,24 +123,24 @@
   height: 18px;
 }
 
-.sona-sidebar-item-label {
+.sonaenhance-sidebar-item-label {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 /* 收缩状态下导航项居中 */
-.sona-sidebar--collapsed .sona-sidebar-item {
+.sonaenhance-sidebar--collapsed .sonaenhance-sidebar-item {
   justify-content: center;
   padding: 8px;
 }
 
-.sona-sidebar--collapsed .sona-sidebar-logo {
+.sonaenhance-sidebar--collapsed .sonaenhance-sidebar-logo {
   justify-content: center;
   padding: 14px 0;
 }
 
 /* ---- 底部按钮区 ---- */
-.sona-sidebar-footer {
+.sonaenhance-sidebar-footer {
   display: flex;
   justify-content: center;
   padding: 8px 6px;
@@ -148,7 +148,7 @@
   flex-shrink: 0;
 }
 
-.sona-sidebar-toggle {
+.sonaenhance-sidebar-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,12 +163,12 @@
   padding: 0;
 }
 
-.sona-sidebar-toggle:hover {
+.sonaenhance-sidebar-toggle:hover {
   color: #c8aa6e;
   background: rgba(200, 170, 110, 0.1);
   border-color: rgba(200, 170, 110, 0.25);
 }
 
-.sona-sidebar-toggle:active {
+.sonaenhance-sidebar-toggle:active {
   transform: scale(0.9);
 }

@@ -36,26 +36,26 @@ function ChampionPriorityCards({
   championFallback: (championId: number) => string
 }) {
   if (championIds.length === 0) {
-    return <p className="sona-subtitle" style={{ margin: 0 }}>{emptyText}</p>
+    return <p className="sonaenhance-subtitle" style={{ margin: 0 }}>{emptyText}</p>
   }
 
   return (
-    <div className="sona-champ-priority-list">
+    <div className="sonaenhance-champ-priority-list">
       {championIds.map((championId, index) => {
         const champion = getChampionById(championId)
         return (
-          <div className="sona-champ-priority-card" key={championId}>
-            <span className="sona-champ-priority-index">{index + 1}</span>
+          <div className="sonaenhance-champ-priority-card" key={championId}>
+            <span className="sonaenhance-champ-priority-index">{index + 1}</span>
             <img
-              className="sona-champ-priority-icon"
+              className="sonaenhance-champ-priority-icon"
               src={`/lol-game-data/assets/v1/champion-icons/${championId}.png`}
               alt=""
             />
-            <span className="sona-champ-priority-name">
+            <span className="sonaenhance-champ-priority-name">
               {champion ? `${champion.title} ${champion.name}` : championFallback(championId)}
             </span>
             <button
-              className="sona-champ-priority-remove"
+              className="sonaenhance-champ-priority-remove"
               type="button"
               onClick={() => onRemove(championId)}
               aria-label={removeLabel}
@@ -209,10 +209,10 @@ export function ToolsPage() {
   }
 
   return (
-    <div className="sona-settings">
-      <h2 className="sona-settings-title">{t('tools.title')}</h2>
+    <div className="sonaenhance-settings">
+      <h2 className="sonaenhance-settings-title">{t('tools.title')}</h2>
 
-      <div className="sona-tool-nav">
+      <div className="sonaenhance-tool-nav">
         {toolSections.map((section) => (
           <button key={section.id} type="button" onClick={() => scrollToToolSection(section.id)}>
             {t(section.labelKey)}
@@ -220,7 +220,7 @@ export function ToolsPage() {
         ))}
       </div>
 
-      <section id="tool-section-champ-select" className="sona-tool-section">
+      <section id="tool-section-champ-select" className="sonaenhance-tool-section">
       <SettingGroup title={t('tools.nav.champSelect')}>
         <SettingCard
           title={t('tools.autoAccept.title')}
@@ -340,7 +340,7 @@ export function ToolsPage() {
       </SettingGroup>
       </section>
 
-      <section id="tool-section-opgg" className="sona-tool-section">
+      <section id="tool-section-opgg" className="sonaenhance-tool-section">
       <SettingGroup title={t('tools.nav.opgg')}>
         <SettingCard
           title={t('tools.opggBuild.title')}
@@ -381,7 +381,7 @@ export function ToolsPage() {
       </SettingGroup>
       </section>
 
-      <section id="tool-section-automation" className="sona-tool-section">
+      <section id="tool-section-automation" className="sonaenhance-tool-section">
       <SettingGroup title={t('tools.nav.automation')}>
         <SettingCard
           title={t('tools.balanceBuff.title')}
@@ -457,7 +457,7 @@ export function ToolsPage() {
         </SettingCard>
         {autoLockChampion && (
           <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div className="sona-debug-actions" style={{ alignItems: 'flex-start', gap: 8 }}>
+            <div className="sonaenhance-debug-actions" style={{ alignItems: 'flex-start', gap: 8 }}>
               <div style={{ flex: 1, position: 'relative' }} ref={champSuggestRef}>
                 <SonaInput
                   value={champSearchText}
@@ -470,17 +470,17 @@ export function ToolsPage() {
                   placeholder={t('tools.autoLock.placeholder')}
                 />
                 {showChampSuggestions && champSuggestions.length > 0 && (
-                  <div className="sona-champ-suggest">
+                  <div className="sonaenhance-champ-suggest">
                     {champSuggestions.map((c) => (
                       <button
                         key={c.id}
-                        className="sona-champ-suggest-item"
+                        className="sonaenhance-champ-suggest-item"
                         type="button"
                         onClick={() => addAutoLockChampion(c)}
                       >
-                        <img className="sona-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
-                        <span className="sona-champ-suggest-title">{c.title}</span>
-                        <span className="sona-champ-suggest-name">{c.name}</span>
+                        <img className="sonaenhance-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
+                        <span className="sonaenhance-champ-suggest-title">{c.title}</span>
+                        <span className="sonaenhance-champ-suggest-name">{c.name}</span>
                       </button>
                     ))}
                   </div>
@@ -519,7 +519,7 @@ export function ToolsPage() {
         </SettingCard>
         {autoBanChampion && (
           <div style={{ padding: '0 12px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div className="sona-debug-actions" style={{ alignItems: 'flex-start', gap: 8 }}>
+            <div className="sonaenhance-debug-actions" style={{ alignItems: 'flex-start', gap: 8 }}>
               <div style={{ flex: 1, position: 'relative' }} ref={banChampSuggestRef}>
                 <SonaInput
                   value={banChampSearchText}
@@ -532,17 +532,17 @@ export function ToolsPage() {
                   placeholder={t('tools.autoBan.placeholder')}
                 />
                 {showBanChampSuggestions && (
-                  <div className="sona-champ-suggest">
+                  <div className="sonaenhance-champ-suggest">
                     {banChampSuggestions.map((c) => (
                       <button
                         key={c.id}
-                        className="sona-champ-suggest-item"
+                        className="sonaenhance-champ-suggest-item"
                         type="button"
                         onClick={() => addAutoBanChampion(c)}
                       >
-                        <img className="sona-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
-                        <span className="sona-champ-suggest-title">{c.title}</span>
-                        <span className="sona-champ-suggest-name">{c.name}</span>
+                        <img className="sonaenhance-champ-suggest-icon" src={`/lol-game-data/assets/v1/champion-icons/${c.id}.png`} alt="" />
+                        <span className="sonaenhance-champ-suggest-title">{c.title}</span>
+                        <span className="sonaenhance-champ-suggest-name">{c.name}</span>
                       </button>
                     ))}
                   </div>
@@ -561,7 +561,7 @@ export function ToolsPage() {
       </SettingGroup>
       </section>
 
-      <section id="tool-section-social" className="sona-tool-section">
+      <section id="tool-section-social" className="sonaenhance-tool-section">
       <SettingGroup title={t('tools.nav.social')}>
         <SettingCard
           title={t('tools.unlockStatus.title')}

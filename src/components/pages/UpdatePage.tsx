@@ -31,14 +31,14 @@ export function UpdatePage() {
   }
 
   return (
-    <div className="sona-update-page">
-      <h2 className="sona-update-title">
+    <div className="sonaenhance-update-page">
+      <h2 className="sonaenhance-update-title">
         {info ? (
           <>
             {t('update.titleWithVersion')}
-            <span className="sona-update-title-version">{info.currentVersion}</span>
-            <span className="sona-update-title-arrow">→</span>
-            <span className="sona-update-title-version sona-update-title-version--latest">{info.latestVersion}</span>
+            <span className="sonaenhance-update-title-version">{info.currentVersion}</span>
+            <span className="sonaenhance-update-title-arrow">→</span>
+            <span className="sonaenhance-update-title-version sonaenhance-update-title-version--latest">{info.latestVersion}</span>
           </>
         ) : (
           t('update.title')
@@ -47,18 +47,18 @@ export function UpdatePage() {
 
       {info ? (
         <>
-          <div className="sona-update-release">
-            <div className="sona-update-release-head">
+          <div className="sonaenhance-update-release">
+            <div className="sonaenhance-update-release-head">
               <span>{info.releaseName}</span>
               {info.publishedAt && <time dateTime={info.publishedAt}>{formatPublishedDate(info.publishedAt, language)}</time>}
             </div>
-            <pre className="sona-update-notes">{info.releaseBody}</pre>
+            <pre className="sonaenhance-update-notes">{info.releaseBody}</pre>
           </div>
 
-          <div className="sona-update-download">
+          <div className="sonaenhance-update-download">
             <h3>{t('update.download')}</h3>
             <p>{t('update.downloadHint')}</p>
-            <div className="sona-update-actions">
+            <div className="sonaenhance-update-actions">
               <SonaButton variant="primary" onClick={() => openUrl(info.releaseUrl || getReleasePageUrl())}>
                 {t('update.openRelease')}
               </SonaButton>
@@ -72,7 +72,7 @@ export function UpdatePage() {
           </div>
         </>
       ) : (
-        <div className="sona-update-empty">
+        <div className="sonaenhance-update-empty">
           <p>{updateState.status === 'checking' ? t('update.checking') : updateState.status === 'error' ? t('update.error', { error: updateState.error }) : t('update.none')}</p>
           <SonaButton onClick={() => { void checkForUpdates() }}>
             {t('update.retry')}
