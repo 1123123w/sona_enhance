@@ -56,6 +56,18 @@ declare global {
     getScriptPath(): string
     /** Sona plugin runtime state */
     __SONAENHANCE_RUNTIME__?: SonaRuntime
+    /** Sona-E debug helpers exposed for DevTools diagnostics */
+    __SONAENHANCE_DEBUG__?: SonaEnhanceDebugApi
+  }
+
+  interface SonaEnhanceDebugApi {
+    runtimeState?: () => unknown
+    opgg?: () => unknown
+    counter?: () => unknown
+    features?: () => unknown
+    config?: () => unknown
+    logs?: (limit?: number) => unknown
+    [key: string]: unknown
   }
 
   /** Pengu Loader namespace */

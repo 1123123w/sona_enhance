@@ -32,6 +32,7 @@ import { updateChampSelectCounterRecommendation } from '@/lib/features/champsele
 import { preloadChampSelectTierBadgeData, updateChampSelectTierBadge } from '@/lib/features/champselect-tier-badge'
 import { setAvailabilityHijackEnabled, setHideTFTEnabled, setHideRightNavTextEnabled } from '@/lib/injections'
 import { calculateSonaPlayerStrengthScore, type SonaPlayerStrengthScore } from '@/lib/player-strength-score'
+import { initRuntimeState } from '@/lib/runtime-state'
 
 // ==================== 共享：查询队友胜率 ====================
 
@@ -825,6 +826,8 @@ export function initFeatures() {
   // 隐藏主页右侧导航栏文字
   setHideRightNavTextEnabled(store.get('hideRightNavText'))
   store.onChange('hideRightNavText', setHideRightNavTextEnabled)
+
+  initRuntimeState()
 
   // 恢复窗口特效
   const savedEffect = store.get('windowEffect')

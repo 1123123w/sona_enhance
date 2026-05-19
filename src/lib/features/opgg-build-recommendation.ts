@@ -9,6 +9,7 @@
 
 import { logger } from '@/index'
 import { injector } from '@/lib/InjectorManager'
+import { registerDebugHandle } from '@/lib/debug'
 import { createElement } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
@@ -89,6 +90,7 @@ let currentContext: RecommendationContext = {
 let lastValidContext: RecommendationContext | null = null
 let currentChampionLocked = false
 let rearmTimer: number | null = null
+let hasLoggedMissingAbilityPreviewPanel = false
 const boundElements: Array<{ el: HTMLElement; handler: EventListener; originalText: string }> = []
 const recommendationCache = new Map<string, RecommendationCacheEntry>()
 let outsideCloseHandler: ((event: MouseEvent) => void) | null = null
@@ -107,6 +109,72 @@ const itemSetSyncInFlightKeys = new Set<string>()
 const opggRuneSyncInFlightKeys = new Set<string>()
 const runeApplyInFlightKeys = new Set<string>()
 const spellApplyInFlightKeys = new Set<string>()
+
+function getElementRect(el: Element) {
+  const rect = el.getBoundingClientRect()
+  return {
+    x: Math.round(rect.x),
+    y: Math.round(rect.y),
+    w: Math.round(rect.width),
+    h: Math.round(rect.height),
+  }
+}
+
+function getOpggDebugSnapshot() {
+  const targets = document.querySelectorAll(TARGET_SELECTOR)
+  const hijackedTargets = document.querySelectorAll(`${TARGET_SELECTOR}[${HIJACK_ATTR}]`)
+  const cacheEntries = Array.from(recommendationCache.values()).map((entry) => ({
+    key: entry.key,
+    championId: entry.context.championId,
+    queueId: entry.context.queueId,
+    gameMode: entry.context.gameMode,
+    position: entry.context.position,
+    hasData: entry.data !== undefined,
+    error: entry.error || '',
+    updatedAt: entry.updatedAt,
+  }))
+
+  return {
+    enabled: Boolean(phaseUnsub),
+    hasChampSelectListener: Boolean(champSelectUnsub),
+    hasRunePagesListener: Boolean(runePagesUnsub),
+    injectRegistered,
+    rearmActive: rearmTimer != null,
+    currentContext: { ...currentContext },
+    lastValidContext: lastValidContext ? { ...lastValidContext } : null,
+    currentChampionLocked,
+    panelOpen: Boolean(document.getElementById(PANEL_ID)),
+    activePanelKey,
+    lastApplied: {
+      itemSet: lastAppliedItemSetKey,
+      rune: lastAppliedRuneKey,
+      spell: lastAppliedSpellKey,
+    },
+    dom: {
+      targets: targets.length,
+      hijackedTargets: hijackedTargets.length,
+      panel: Boolean(document.getElementById(PANEL_ID)),
+    },
+    bound: boundElements.map(({ el, originalText }) => ({
+      connected: el.isConnected,
+      text: el.innerText,
+      originalText,
+      hasAttr: el.getAttribute(HIJACK_ATTR) === 'true',
+      rect: getElementRect(el),
+    })),
+    cacheEntries,
+    inFlight: {
+      itemSet: itemSetSyncInFlightKeys.size,
+      opggRune: opggRuneSyncInFlightKeys.size,
+      runeApply: runeApplyInFlightKeys.size,
+      spellApply: spellApplyInFlightKeys.size,
+    },
+  }
+}
+
+function installOpggDebugHandle() {
+  registerDebugHandle('opgg', getOpggDebugSnapshot)
+}
 
 function getLocalChampionId(session: ChampSelectSession): number {
   const localPlayer = session.myTeam.find((player) => player.cellId === session.localPlayerCellId)
@@ -1259,6 +1327,8 @@ function renderRecommendationPanel(
 function tryHijackAbilityPreviewPanel(): boolean {
   const targets = document.querySelectorAll(`${TARGET_SELECTOR}:not([${HIJACK_ATTR}])`)
   if (targets.length === 0) {
+    if (hasLoggedMissingAbilityPreviewPanel) return false
+    hasLoggedMissingAbilityPreviewPanel = true
     logger.info('[OPGG] 未找到技能预览面板元素')
     return false
   }
@@ -1290,6 +1360,7 @@ function tryHijackAbilityPreviewPanel(): boolean {
   })
 
   logger.info('[OPGG] 已接管技能预览面板点击 → %d 个元素', targets.length)
+  hasLoggedMissingAbilityPreviewPanel = true
   return true
 }
 
@@ -1317,6 +1388,7 @@ function stopRearmTimer() {
 }
 
 function unmountPanel() {
+  hasLoggedMissingAbilityPreviewPanel = false
   if (injectRegistered) {
     injector.unregister(tryHijackAbilityPreviewPanel)
     injectRegistered = false
@@ -1363,6 +1435,8 @@ function unmount(resetContext = true) {
 }
 
 export function updateOpggBuildRecommendation(enabled: boolean) {
+  installOpggDebugHandle()
+
   if (enabled && !phaseUnsub) {
     phaseUnsub = lcu.observe(LcuEventUri.GAMEFLOW_PHASE_CHANGE, (event: LCUEventMessage) => {
       const phase = event.data as GameflowPhase
@@ -1423,3 +1497,5 @@ window.addEventListener(OPGG_CACHE_CLEARED_EVENT, () => {
   lastAppliedRuneKey = ''
   lastAppliedSpellKey = ''
 })
+
+installOpggDebugHandle()

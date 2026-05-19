@@ -5,6 +5,12 @@
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug'
 
+export interface RecentSonaLogEntry {
+  at: number
+  level: LogLevel
+  message: string
+}
+
 interface LoggerOptions {
   /** 插件名称 */
   name: string
@@ -21,6 +27,54 @@ const LEVEL_CONFIG: Record<LogLevel, { badge: string; color: string; method: key
   warn:  { badge: 'WARN',  color: '#faa61a', method: 'warn'  },
   error: { badge: 'ERROR', color: '#f04747', method: 'error' },
   debug: { badge: 'DEBUG', color: '#7289da', method: 'debug' },
+}
+
+const RECENT_LOG_LIMIT = 200
+const recentLogs: RecentSonaLogEntry[] = []
+const JWT_PATTERN = /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g
+const BEARER_PATTERN = /\bBearer\s+[A-Za-z0-9._-]+\b/gi
+
+function redactString(value: string) {
+  return value
+    .replace(BEARER_PATTERN, 'Bearer [REDACTED]')
+    .replace(JWT_PATTERN, '[REDACTED_JWT]')
+}
+
+function truncate(value: string, limit = 800) {
+  return value.length > limit ? `${value.slice(0, limit)}...` : value
+}
+
+function stringifyForDebug(value: unknown): string {
+  if (typeof value === 'string') return truncate(redactString(value))
+  if (typeof value === 'number' || typeof value === 'boolean' || value === null) return String(value)
+  if (value instanceof Error) return truncate(redactString(`${value.name}: ${value.message}`))
+  if (typeof value === 'undefined') return 'undefined'
+  if (typeof value === 'function') return '[Function]'
+  if (Array.isArray(value)) return `[Array(${value.length})]`
+
+  if (typeof value === 'object') {
+    const ctorName = value.constructor?.name || 'Object'
+    const keys = Object.keys(value as Record<string, unknown>).slice(0, 12)
+    return keys.length > 0 ? `[${ctorName} keys=${keys.join(',')}]` : `[${ctorName}]`
+  }
+
+  return Object.prototype.toString.call(value)
+}
+
+function pushRecentLog(level: LogLevel, message: string, args: unknown[]) {
+  recentLogs.push({
+    at: Date.now(),
+    level,
+    message: [message, ...args.map(stringifyForDebug)].join(' '),
+  })
+
+  if (recentLogs.length > RECENT_LOG_LIMIT) {
+    recentLogs.splice(0, recentLogs.length - RECENT_LOG_LIMIT)
+  }
+}
+
+export function getRecentSonaLogs(limit = 50): RecentSonaLogEntry[] {
+  return recentLogs.slice(-limit)
 }
 
 export function createLogger(options: LoggerOptions) {
@@ -71,6 +125,7 @@ export function createLogger(options: LoggerOptions) {
    */
   function log(level: LogLevel, message: string, ...args: unknown[]) {
     const { badge, color, method } = LEVEL_CONFIG[level]
+    pushRecentLog(level, message, args)
 
     const nameBadgeStyle = [
       'color: #fff',

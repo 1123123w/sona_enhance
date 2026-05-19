@@ -1340,7 +1340,13 @@ class LCUManager {
       console.log('[LCUManager] WS 收到事件 → uri=%s, data=%o', uri, data)
       const message = data as LCUEventMessage
       const cbs = this.eventListeners.get(uri)
-      cbs?.forEach((cb) => cb(message))
+      cbs?.forEach((cb) => {
+        try {
+          cb(message)
+        } catch (err) {
+          console.error('[LCUManager] event listener failed -> uri=%s', uri, err)
+        }
+      })
     })
   }
 

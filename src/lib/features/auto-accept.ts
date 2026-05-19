@@ -2,6 +2,7 @@ import { logger } from '@/index'
 import { store } from '@/lib/store'
 import { lcu, LcuEventUri } from '@/lib/lcu'
 import type { LCUEventMessage, GameflowPhase } from '@/lib/lcu'
+import { DelayTask, type TaskSignal } from '@/lib/cancellable-task'
 
 // ==================== 自动接受对局 ====================
 
@@ -9,10 +10,9 @@ const AUTO_ACCEPT_MAX_DELAY_MS = 15000
 const READY_CHECK_POLL_INTERVAL_MS = 200
 
 let autoAcceptUnsub: (() => void) | null = null
-/** 记录当次 ReadyCheck 已调度的定时器，phase 离开 ReadyCheck 要清掉防止误触 */
-let autoAcceptTimer: ReturnType<typeof setTimeout> | null = null
 let readyCheckPollTimer: ReturnType<typeof setInterval> | null = null
-let autoAcceptToken = 0
+const autoAcceptTask = new DelayTask()
+let activeAutoAcceptSignal: TaskSignal | null = null
 
 /**
  * 计算本次 accept 的延迟毫秒数：
@@ -41,12 +41,8 @@ function computeAcceptDelayMs(): number {
 }
 
 function clearAutoAcceptTimer() {
-  autoAcceptToken++
-
-  if (autoAcceptTimer) {
-    clearTimeout(autoAcceptTimer)
-    autoAcceptTimer = null
-  }
+  autoAcceptTask.cancel()
+  activeAutoAcceptSignal = null
 
   if (readyCheckPollTimer) {
     clearInterval(readyCheckPollTimer)
@@ -64,18 +60,18 @@ async function isReadyCheckAcceptable(): Promise<boolean> {
   }
 }
 
-function startReadyCheckPolling(token: number) {
+function startReadyCheckPolling(signal: TaskSignal) {
   if (readyCheckPollTimer) {
     clearInterval(readyCheckPollTimer)
     readyCheckPollTimer = null
   }
 
   readyCheckPollTimer = setInterval(() => {
-    if (token !== autoAcceptToken) return
+    if (signal.cancelled) return
 
     lcu.getReadyCheck()
       .then((readyCheck) => {
-        if (token !== autoAcceptToken) return
+        if (signal.cancelled) return
 
         if (readyCheck.state !== 'InProgress' || readyCheck.playerResponse !== 'None') {
           logger.info(
@@ -87,7 +83,7 @@ function startReadyCheckPolling(token: number) {
         }
       })
       .catch((err) => {
-        if (token !== autoAcceptToken) return
+        if (signal.cancelled) return
         logger.warn('[AutoAccept] ReadyCheck 轮询失败，取消本次自动接受: %o', err)
         clearAutoAcceptTimer()
       })
@@ -99,33 +95,36 @@ function scheduleAcceptMatch() {
   clearAutoAcceptTimer()
 
   const delayMs = computeAcceptDelayMs()
-  const token = autoAcceptToken
 
-  const doAccept = async () => {
-    if (token !== autoAcceptToken) return
+  const doAccept = async (signal: TaskSignal) => {
+    try {
+      if (signal.cancelled) return
 
-    autoAcceptTimer = null
-    if (readyCheckPollTimer) {
-      clearInterval(readyCheckPollTimer)
-      readyCheckPollTimer = null
+      if (readyCheckPollTimer) {
+        clearInterval(readyCheckPollTimer)
+        readyCheckPollTimer = null
+      }
+
+      if (!await isReadyCheckAcceptable()) {
+        logger.info('[AutoAccept] ReadyCheck 不再可接受，跳过本次自动接受')
+        return
+      }
+      if (signal.cancelled) return
+
+      lcu.acceptMatch()
+        .then(() => logger.info('Auto accepted match ✓ (delay=%dms)', delayMs))
+        .catch((err) => logger.error('Auto accept failed:', err))
+    } finally {
+      if (activeAutoAcceptSignal === signal) {
+        activeAutoAcceptSignal = null
+      }
     }
-
-    if (!await isReadyCheckAcceptable()) {
-      logger.info('[AutoAccept] ReadyCheck 不再可接受，跳过本次自动接受')
-      return
-    }
-
-    lcu.acceptMatch()
-      .then(() => logger.info('Auto accepted match ✓ (delay=%dms)', delayMs))
-      .catch((err) => logger.error('Auto accept failed:', err))
   }
 
-  if (delayMs === 0) {
-    doAccept()
-  } else {
+  activeAutoAcceptSignal = autoAcceptTask.schedule(delayMs, doAccept)
+  if (delayMs > 0) {
     logger.info('[AutoAccept] 随机延迟 %dms 后接受', delayMs)
-    startReadyCheckPolling(token)
-    autoAcceptTimer = setTimeout(doAccept, delayMs)
+    startReadyCheckPolling(activeAutoAcceptSignal)
   }
 }
 
@@ -135,7 +134,7 @@ export function updateAutoAccept(enabled: boolean) {
       const phase = event.data as GameflowPhase
       if (phase === 'ReadyCheck') {
         scheduleAcceptMatch()
-      } else if (autoAcceptTimer || readyCheckPollTimer) {
+      } else if (activeAutoAcceptSignal || autoAcceptTask.active || readyCheckPollTimer) {
         // ReadyCheck 窗口关闭（玩家手动拒绝 / 自动超时 / 队友拒绝）时清掉定时器，
         // 避免我们稍后的 accept 在"下一次 ReadyCheck 到来前"误触
         clearAutoAcceptTimer()

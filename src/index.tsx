@@ -3,6 +3,7 @@ declare const __PLUGIN_VERSION__: string  //  这个变量信息在vite.config.j
 
 import { createRoot } from 'react-dom/client'
 import { App } from '@/App'
+import { installCoreDebugHandles } from '@/lib/debug'
 import { createLogger } from '@/lib/logger'
 import { registerAllInjections } from '@/lib/injections'
 import { initFeatures } from '@/lib/features'
@@ -90,6 +91,7 @@ export function init(context: PenguContext) {
  */
 export function load() {
   logger.info('Plugin loading...')
+  installCoreDebugHandles()
   registerAllInjections()  //  注册所有 DOM 注入点并启动守护
   initFeatures()           //  初始化功能监听（自动接受、解锁签名等）
   registerHotkey()         //  注册 F1 快捷键

@@ -1,6 +1,7 @@
 import { logger } from '@/index'
 import { CounterRecommendationModal, type CounterRecommendationItem } from '@/components/ui/CounterRecommendationModal'
 import { getChampionById } from '@/lib/assets'
+import { registerDebugHandle } from '@/lib/debug'
 import { injector } from '@/lib/InjectorManager'
 import { lcu, LcuEventUri, type ChampSelectSession, type LCUEventMessage } from '@/lib/lcu'
 import {
@@ -71,6 +72,69 @@ let counterModalRoot: Root | null = null
 let counterModalContainer: HTMLDivElement | null = null
 let rearmTimer: number | null = null
 const boundEnemyIcons: Array<{ el: HTMLElement; handler: EventListener }> = []
+
+function getElementRect(el: Element) {
+  const rect = el.getBoundingClientRect()
+  return {
+    x: Math.round(rect.x),
+    y: Math.round(rect.y),
+    w: Math.round(rect.width),
+    h: Math.round(rect.height),
+  }
+}
+
+function getCounterDebugSnapshot() {
+  const visibleEnemyWrappers = document.querySelectorAll('.party.visible .summoner-wrapper.visible.right')
+  const allEnemyWrappers = document.querySelectorAll('.summoner-wrapper.visible.right')
+  const boundAttrWrappers = document.querySelectorAll(`[${COUNTER_CLICK_ATTR}="true"]`)
+  const suggestionCounts = Array.from(suggestionsByEnemyId.entries()).map(([enemyId, suggestions]) => ({
+    enemyId,
+    count: suggestions.length,
+  }))
+
+  return {
+    enabled: Boolean(phaseUnsub),
+    hasChampSelectListener: Boolean(champSelectUnsub),
+    injectRegistered,
+    rearmActive: rearmTimer != null,
+    hasCurrentSession: Boolean(currentSession),
+    queueId: currentSession?.queueId ?? 0,
+    localPlayerCellId: currentSession?.localPlayerCellId ?? -1,
+    enemySignature: currentSession ? getEnemySignature(currentSession) : '',
+    enemies: currentSession?.theirTeam.map((player) => ({
+      cellId: player.cellId,
+      championId: player.championId,
+      championPickIntent: player.championPickIntent,
+      assignedPosition: player.assignedPosition || '',
+      selectedChampionId: getSelectedChampionId(player),
+    })) ?? [],
+    dataState: counterDataState,
+    message: counterDataMessage,
+    suggestionCounts,
+    rankedSummary: {
+      cached: Boolean(rankedSummaryCache),
+      tier: rankedSummaryCacheTier,
+      inFlight: Boolean(rankedSummaryPromise),
+    },
+    dom: {
+      visibleEnemyWrappers: visibleEnemyWrappers.length,
+      allEnemyWrappers: allEnemyWrappers.length,
+      boundAttrs: boundAttrWrappers.length,
+      modalRoot: Boolean(document.getElementById('sonaenhance-counter-recommendation-modal-root')),
+      modalOpen: Boolean(document.querySelector('[data-sonaenhance-counter-modal="true"]')),
+    },
+    bound: boundEnemyIcons.map(({ el }) => ({
+      connected: el.isConnected,
+      championId: Number(el.getAttribute(COUNTER_CHAMPION_ATTR) || 0),
+      hasAttr: el.getAttribute(COUNTER_CLICK_ATTR) === 'true',
+      rect: getElementRect(el),
+    })),
+  }
+}
+
+function installCounterDebugHandle() {
+  registerDebugHandle('counter', getCounterDebugSnapshot)
+}
 
 function normalizeOpggTier(value: string): OpggTier {
   return SELECTABLE_OPGG_TIERS.includes(value as OpggTier) ? value as OpggTier : DEFAULT_COUNTER_TIER
@@ -484,6 +548,8 @@ function unmount() {
 }
 
 export function updateChampSelectCounterRecommendation(enabled: boolean) {
+  installCounterDebugHandle()
+
   if (enabled && !phaseUnsub) {
     phaseUnsub = lcu.observe(LcuEventUri.GAMEFLOW_PHASE_CHANGE, (event: LCUEventMessage) => {
       const phase = event.data as GameflowPhase
@@ -533,3 +599,5 @@ window.addEventListener(OPGG_CACHE_CLEARED_EVENT, () => {
   counterDataMessage = ''
   if (currentSession) void refreshCounterRecommendations(currentSession)
 })
+
+installCounterDebugHandle()
