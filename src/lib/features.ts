@@ -6,7 +6,7 @@
  */
 
 import { logger } from '@/index'
-import { store } from '@/lib/store'
+import { SETTING_KEYS, store } from '@/lib/store'
 import { lcu, LcuEventUri, queueIdToTag } from '@/lib/lcu'
 import type { LCUEventMessage, GameflowPhase, ChampSelectSession } from '@/lib/lcu'
 import { injector } from '@/lib/InjectorManager'
@@ -736,8 +736,8 @@ function updateSideIndicator(enabled: boolean) {
 export function initFeatures() {
   preloadChampSelectTierBadgeData()
 
-  updateAutoAccept(store.get('autoAcceptMatch'))
-  store.onChange('autoAcceptMatch', updateAutoAccept)
+  updateAutoAccept(store.get(SETTING_KEYS.autoAcceptMatch))
+  store.onChange(SETTING_KEYS.autoAcceptMatch, updateAutoAccept)
 
   updateDebugGameflow(store.get('developerMode'))
   store.onChange('developerMode', updateDebugGameflow)
@@ -762,18 +762,20 @@ export function initFeatures() {
   })
 
   const updateOpggLifecycle = () => {
-    updateOpggBuildRecommendation(store.get('opggBuildRecommendation') || store.get('smartBuildRecommendation'))
+    updateOpggBuildRecommendation(
+      store.get(SETTING_KEYS.opggBuildRecommendation) || store.get(SETTING_KEYS.smartBuildRecommendation),
+    )
   }
   updateOpggLifecycle()
-  updateOpggBanRecommendation(store.get('opggBuildRecommendation'))
-  store.onChange('opggBuildRecommendation', () => {
+  updateOpggBanRecommendation(store.get(SETTING_KEYS.opggBuildRecommendation))
+  store.onChange(SETTING_KEYS.opggBuildRecommendation, () => {
     updateOpggLifecycle()
-    updateOpggBanRecommendation(store.get('opggBuildRecommendation'))
+    updateOpggBanRecommendation(store.get(SETTING_KEYS.opggBuildRecommendation))
   })
-  store.onChange('smartBuildRecommendation', updateOpggLifecycle)
+  store.onChange(SETTING_KEYS.smartBuildRecommendation, updateOpggLifecycle)
 
-  updateChampSelectCounterRecommendation(store.get('champSelectCounterRecommendation'))
-  store.onChange('champSelectCounterRecommendation', updateChampSelectCounterRecommendation)
+  updateChampSelectCounterRecommendation(store.get(SETTING_KEYS.champSelectCounterRecommendation))
+  store.onChange(SETTING_KEYS.champSelectCounterRecommendation, updateChampSelectCounterRecommendation)
 
   updateGlobalParticle(store.get('globalParticle'))
   store.onChange('globalParticle', updateGlobalParticle)

@@ -9,7 +9,7 @@ import {
   type OpggRankedDataItem,
   type OpggTier,
 } from '@/lib/opgg-api'
-import { store } from '@/lib/store'
+import { SETTING_KEYS, store } from '@/lib/store'
 import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 
@@ -99,7 +99,9 @@ function createEmptyRecommendations(): BanRecommendationsByLane {
   }
 }
 
-async function ensureRankedSummary(tier = normalizeOpggTier(store.get('opggBuildRecommendationTier'))): Promise<OpggRankedChampionsSummary> {
+async function ensureRankedSummary(
+  tier = normalizeOpggTier(store.get(SETTING_KEYS.opggBuildRecommendationTier)),
+): Promise<OpggRankedChampionsSummary> {
   if (rankedSummaryCache && rankedSummaryCacheTier === tier) return rankedSummaryCache
   if (rankedSummaryPromise) return rankedSummaryPromise
 
@@ -156,7 +158,7 @@ function toRate(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0
 }
 
-async function loadBanRecommendations(tier = normalizeOpggTier(store.get('opggBuildRecommendationTier'))) {
+async function loadBanRecommendations(tier = normalizeOpggTier(store.get(SETTING_KEYS.opggBuildRecommendationTier))) {
   banState = 'loading'
   banMessage = ''
   renderBanModal(true)
@@ -184,7 +186,7 @@ function renderBanModal(open: boolean) {
     modalRoot = createRoot(modalContainer)
   }
 
-  const selectedTier = normalizeOpggTier(store.get('opggBuildRecommendationTier'))
+  const selectedTier = normalizeOpggTier(store.get(SETTING_KEYS.opggBuildRecommendationTier))
   const close = () => renderBanModal(false)
 
   modalRoot?.render(
@@ -197,7 +199,7 @@ function renderBanModal(open: boolean) {
       recommendations: banRecommendations,
       onTierChange: (tier: OpggTier) => {
         const nextTier = normalizeOpggTier(tier)
-        store.set('opggBuildRecommendationTier', nextTier)
+        store.set(SETTING_KEYS.opggBuildRecommendationTier, nextTier)
         void loadBanRecommendations(nextTier)
       },
       onClose: close,

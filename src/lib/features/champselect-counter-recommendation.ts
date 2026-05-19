@@ -13,7 +13,7 @@ import {
   type OpggRankedPosition,
   type OpggTier,
 } from '@/lib/opgg-api'
-import { store } from '@/lib/store'
+import { SETTING_KEYS, store } from '@/lib/store'
 import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { GameflowPhase } from '@/types/lcu'
@@ -221,7 +221,7 @@ function getEnemySignature(session: ChampSelectSession): string {
 }
 
 async function ensureRankedSummary(): Promise<OpggRankedChampionsSummary> {
-  const tier = normalizeOpggTier(store.get('opggBuildRecommendationTier'))
+  const tier = normalizeOpggTier(store.get(SETTING_KEYS.opggBuildRecommendationTier))
   if (rankedSummaryCache && rankedSummaryCacheTier === tier) return rankedSummaryCache
   if (rankedSummaryPromise) return rankedSummaryPromise
 

@@ -17,7 +17,7 @@ import { getAllChampions, getAugmentInfo, getChampionById, getQueue, getQueueNam
 import { OpggBuildRecommendationPanel, type BuildRecommendation, type RecommendationContext } from '@/components/ui/OpggBuildRecommendationPanel'
 import { applyOpggRunePage } from '@/lib/opgg-runes'
 import { lcu, LcuEventUri, type ChampSelectSession, type ItemSet, type ItemSetBlock, type LCUEventMessage, type RunePage, type RunePagePayload } from '@/lib/lcu'
-import { store } from '@/lib/store'
+import { SETTING_KEYS, store } from '@/lib/store'
 import { aramggApi, type AramggChampionRecommendation, type AramggChampionStatEntry, type AramggCoreItemBuild, type AramggMayhemAugments } from '@/lib/aramgg-api'
 import {
   OPGG_CACHE_CLEARED_EVENT,
@@ -278,7 +278,7 @@ function normalizeOpggTier(value: string): OpggTier {
 }
 
 function getSelectedOpggTier(): OpggTier {
-  return normalizeOpggTier(store.get('opggBuildRecommendationTier'))
+  return normalizeOpggTier(store.get(SETTING_KEYS.opggBuildRecommendationTier))
 }
 
 function getEffectiveOpggTier(context: RecommendationContext): OpggTier {
@@ -521,7 +521,7 @@ function isCurrentRecommendationContext(context: RecommendationContext): boolean
 }
 
 function saveCurrentSmartRunePage(page: RunePage): void {
-  if (!store.get('smartBuildRecommendation')) return
+  if (!store.get(SETTING_KEYS.smartBuildRecommendation)) return
   if (Date.now() < suppressRuneSaveUntil) return
   if (currentContext.championId <= 0 || !currentChampionLocked) return
   if (page.current === false && page.isActive === false) return
@@ -542,7 +542,7 @@ function saveCurrentSmartRunePage(page: RunePage): void {
 }
 
 function saveCurrentSmartSummonerSpells(player: ChampSelectSession['myTeam'][number], context: RecommendationContext): void {
-  if (!store.get('smartBuildRecommendation')) return
+  if (!store.get(SETTING_KEYS.smartBuildRecommendation)) return
   if (Date.now() < suppressSpellSaveUntil) return
   if (!currentChampionLocked || context.championId <= 0) return
 
@@ -606,7 +606,7 @@ async function upsertRecommendedItemSet(context: RecommendationContext, recommen
 }
 
 function syncRecommendedItemSetWhenReady(entry: RecommendationCacheEntry): void {
-  if (!store.get('smartBuildRecommendation')) return
+  if (!store.get(SETTING_KEYS.smartBuildRecommendation)) return
   if (!currentChampionLocked) return
 
   const syncKey = getManagedItemSetUid(entry.context)
@@ -615,7 +615,7 @@ function syncRecommendedItemSetWhenReady(entry: RecommendationCacheEntry): void 
   itemSetSyncInFlightKeys.add(syncKey)
   entry.promise
     .then(async (recommendation) => {
-      if (!recommendation || !store.get('smartBuildRecommendation')) return
+      if (!recommendation || !store.get(SETTING_KEYS.smartBuildRecommendation)) return
       if (!currentChampionLocked) return
       if (!isCurrentRecommendationContext(entry.context)) return
       if (lastAppliedItemSetKey === syncKey) return
@@ -641,7 +641,7 @@ function getManagedRuneKey(context: RecommendationContext): string {
 }
 
 function hasSavedSmartRunePage(context: RecommendationContext): boolean {
-  if (!store.get('smartBuildRecommendation')) return false
+  if (!store.get(SETTING_KEYS.smartBuildRecommendation)) return false
 
   const runeKey = getSmartRuneKey(context)
   if (!runeKey) return false
@@ -651,8 +651,8 @@ function hasSavedSmartRunePage(context: RecommendationContext): boolean {
 }
 
 function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
-  if (!store.get('opggBuildRecommendation')) return
-  if (!store.get('opggAutoApplyRunes')) return
+  if (!store.get(SETTING_KEYS.opggBuildRecommendation)) return
+  if (!store.get(SETTING_KEYS.opggAutoApplyRunes)) return
   if (!currentChampionLocked) return
   if (hasSavedSmartRunePage(entry.context)) {
     logger.info('[OPGG] Auto rune skipped because a saved smart rune page exists')
@@ -665,7 +665,11 @@ function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
   opggRuneSyncInFlightKeys.add(syncKey)
   entry.promise
     .then(async (recommendation) => {
-      if (!recommendation || !store.get('opggBuildRecommendation') || !store.get('opggAutoApplyRunes')) return
+      if (
+        !recommendation ||
+        !store.get(SETTING_KEYS.opggBuildRecommendation) ||
+        !store.get(SETTING_KEYS.opggAutoApplyRunes)
+      ) return
       if (!currentChampionLocked) return
       if (!isCurrentRecommendationContext(entry.context)) return
       if (lastAppliedRuneKey === syncKey) return
@@ -695,7 +699,7 @@ function syncRecommendedRuneWhenReady(entry: RecommendationCacheEntry): void {
 }
 
 async function applySavedSmartRunePage(context: RecommendationContext): Promise<boolean> {
-  if (!store.get('smartBuildRecommendation')) return false
+  if (!store.get(SETTING_KEYS.smartBuildRecommendation)) return false
   if (!currentChampionLocked) return false
   if (!isCurrentRecommendationContext(context)) return false
 
@@ -724,7 +728,7 @@ async function applySavedSmartRunePage(context: RecommendationContext): Promise<
 }
 
 async function applySavedSmartSummonerSpells(context: RecommendationContext): Promise<boolean> {
-  if (!store.get('smartBuildRecommendation')) return false
+  if (!store.get(SETTING_KEYS.smartBuildRecommendation)) return false
   if (!currentChampionLocked) return false
   if (!isCurrentRecommendationContext(context)) return false
 
@@ -772,7 +776,7 @@ async function applySavedSmartLoadout(context: RecommendationContext): Promise<v
 }
 
 function syncSavedSmartLoadoutWhenReady(context: RecommendationContext): void {
-  if (!store.get('smartBuildRecommendation')) return
+  if (!store.get(SETTING_KEYS.smartBuildRecommendation)) return
   if (!currentChampionLocked) return
 
   pendingSmartLoadoutContext = { ...context }
@@ -825,7 +829,7 @@ async function refreshContext(session?: ChampSelectSession) {
 
     if (currentContext.championId > 0) {
       lastValidContext = { ...currentContext }
-      if (store.get('opggBuildRecommendation')) {
+      if (store.get(SETTING_KEYS.opggBuildRecommendation)) {
         mount()
       } else {
         unmountPanel()
@@ -1226,7 +1230,7 @@ async function openRecommendationPanel(anchor: HTMLElement, contextOverride?: Re
   panelReactRoot = reactRoot
   const handleTierChange = (tier: OpggTier) => {
     const nextTier = normalizeOpggTier(tier)
-    store.set('opggBuildRecommendationTier', nextTier)
+    store.set(SETTING_KEYS.opggBuildRecommendationTier, nextTier)
     recommendationCache.delete(getRecommendationCacheKey(context))
     const cacheEntry = ensureRecommendationPrefetch(context)
     if (cacheEntry) {

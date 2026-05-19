@@ -10,7 +10,7 @@ import { injector } from '@/lib/InjectorManager'
 import { getQueue } from '@/lib/assets'
 import { lcu, LcuEventUri, type ChampSelectSession, type LCUEventMessage } from '@/lib/lcu'
 import { OPGG_CACHE_CLEARED_EVENT, OPGG_DATA_REGION, opggApi, type OpggChampionsTier, type OpggMode, type OpggRankedDataItem, type OpggTier } from '@/lib/opgg-api'
-import { store } from '@/lib/store'
+import { SETTING_KEYS, store } from '@/lib/store'
 import type { GameflowPhase } from '@/types/lcu'
 
 import tierOpIcon from '@/../assets/tier/op.svg'
@@ -101,7 +101,7 @@ function resolveOpggMode(gameMode: string): OpggMode {
 }
 
 function getEffectiveTier(mode: OpggMode): OpggTier {
-  return mode === 'arena' ? 'all' : normalizeOpggTier(store.get('opggBuildRecommendationTier'))
+  return mode === 'arena' ? 'all' : normalizeOpggTier(store.get(SETTING_KEYS.opggBuildRecommendationTier))
 }
 
 function getTierCacheKey(mode: OpggMode, tier: OpggTier): string {
@@ -190,7 +190,7 @@ function ensureTierMap(mode: OpggMode, tier = getEffectiveTier(mode)): Promise<M
 }
 
 export function preloadChampSelectTierBadgeData() {
-  const selectedTier = normalizeOpggTier(store.get('opggBuildRecommendationTier'))
+  const selectedTier = normalizeOpggTier(store.get(SETTING_KEYS.opggBuildRecommendationTier))
   logger.info('[ChampTier] 开始预加载全模式英雄 T 级数据 → tier=%s', selectedTier)
 
   PRELOAD_MODES.forEach((mode) => {

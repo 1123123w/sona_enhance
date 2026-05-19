@@ -135,13 +135,72 @@ export interface SonaConfig {
   autoReturnMode: string
 }
 
+export type ConfigKey = keyof SonaConfig
+
+export type SettingValueType = 'boolean' | 'number' | 'string'
+
+export type SettingFeature = 'autoAccept' | 'opgg' | 'counter'
+
+export interface SettingDefinition<K extends ConfigKey = ConfigKey> {
+  key: K
+  default: SonaConfig[K]
+  type: SettingValueType
+  feature: SettingFeature
+}
+
+export const SETTING_KEYS = {
+  autoAcceptMatch: 'autoAcceptMatch',
+  autoAcceptDelayMin: 'autoAcceptDelayMin',
+  autoAcceptDelayMax: 'autoAcceptDelayMax',
+  opggBuildRecommendation: 'opggBuildRecommendation',
+  opggAutoApplyRunes: 'opggAutoApplyRunes',
+  smartBuildRecommendation: 'smartBuildRecommendation',
+  opggBuildRecommendationTier: 'opggBuildRecommendationTier',
+  champSelectCounterRecommendation: 'champSelectCounterRecommendation',
+} as const satisfies Record<string, ConfigKey>
+
+function defineSetting<K extends ConfigKey>(definition: SettingDefinition<K>): SettingDefinition<K> {
+  return definition
+}
+
+export const HIGH_RISK_SETTING_DEFINITIONS = [
+  defineSetting({ key: SETTING_KEYS.autoAcceptMatch, default: false, type: 'boolean', feature: 'autoAccept' }),
+  defineSetting({ key: SETTING_KEYS.autoAcceptDelayMin, default: 0, type: 'number', feature: 'autoAccept' }),
+  defineSetting({ key: SETTING_KEYS.autoAcceptDelayMax, default: 0, type: 'number', feature: 'autoAccept' }),
+  defineSetting({ key: SETTING_KEYS.opggBuildRecommendation, default: false, type: 'boolean', feature: 'opgg' }),
+  defineSetting({ key: SETTING_KEYS.opggAutoApplyRunes, default: false, type: 'boolean', feature: 'opgg' }),
+  defineSetting({ key: SETTING_KEYS.smartBuildRecommendation, default: true, type: 'boolean', feature: 'opgg' }),
+  defineSetting({ key: SETTING_KEYS.opggBuildRecommendationTier, default: 'emerald_plus', type: 'string', feature: 'opgg' }),
+  defineSetting({ key: SETTING_KEYS.champSelectCounterRecommendation, default: false, type: 'boolean', feature: 'counter' }),
+] as const
+
+export type HighRiskSettingKey = typeof HIGH_RISK_SETTING_DEFINITIONS[number]['key']
+
+export const HIGH_RISK_FEATURE_SETTING_KEYS = HIGH_RISK_SETTING_DEFINITIONS
+  .filter((definition) => definition.type === 'boolean')
+  .map((definition) => definition.key)
+
+export const HIGH_RISK_CONFIG_SETTING_KEYS = HIGH_RISK_SETTING_DEFINITIONS.map((definition) => definition.key)
+
+export function getHighRiskSettingDefinitions(): readonly SettingDefinition<HighRiskSettingKey>[] {
+  return HIGH_RISK_SETTING_DEFINITIONS
+}
+
+function createHighRiskDefaultConfig(): Pick<SonaConfig, HighRiskSettingKey> {
+  const defaults: Partial<Record<HighRiskSettingKey, SonaConfig[HighRiskSettingKey]>> = {}
+  HIGH_RISK_SETTING_DEFINITIONS.forEach((definition) => {
+    defaults[definition.key] = definition.default
+  })
+  return defaults as Pick<SonaConfig, HighRiskSettingKey>
+}
+
+const HIGH_RISK_DEFAULT_CONFIG = createHighRiskDefaultConfig()
+
 
 
 /** 配置项默认值 */
 const DEFAULT_CONFIG: SonaConfig = {
-  autoAcceptMatch: false,
-  autoAcceptDelayMin: 0,
-  autoAcceptDelayMax: 0,
+  ...HIGH_RISK_DEFAULT_CONFIG,
   developerMode: false,
   unlockStatus: true,
   unlockAvailability: false,
@@ -153,14 +212,9 @@ const DEFAULT_CONFIG: SonaConfig = {
   language: 'zh-CN',
   windowEffect: 'none',
   champSelectAssist: false,
-  opggBuildRecommendation: false,
-  opggAutoApplyRunes: false,
-  champSelectCounterRecommendation: false,
-  smartBuildRecommendation: true,
   smartRunePages: {},
   smartSummonerSpells: {},
   gameSettingsBackups: {},
-  opggBuildRecommendationTier: 'emerald_plus',
   analyzeTeamPower: false,
   analyzeTeamPowerMsgType: 'celebration',
   analyzeTeamPowerFetchCount: 50,
@@ -197,7 +251,6 @@ const DEFAULT_CONFIG: SonaConfig = {
 /** DataStore 键前缀，避免与其他插件冲突 */
 const KEY_PREFIX = 'sonaenhance:'
 
-type ConfigKey = keyof SonaConfig
 type ChangeListener<K extends ConfigKey = ConfigKey> = (value: SonaConfig[K], key: K) => void
 
 class SonaStore {

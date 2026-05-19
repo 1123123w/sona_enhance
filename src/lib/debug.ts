@@ -1,16 +1,17 @@
 import { getRecentSonaLogs } from '@/lib/logger'
-import { store, type SonaConfig } from '@/lib/store'
+import {
+  getHighRiskSettingDefinitions,
+  HIGH_RISK_CONFIG_SETTING_KEYS,
+  HIGH_RISK_FEATURE_SETTING_KEYS,
+  store,
+  type ConfigKey,
+  type SonaConfig,
+} from '@/lib/store'
 
 type DebugKey = keyof SonaEnhanceDebugApi
 
-type ConfigKey = keyof SonaConfig
-
 const FEATURE_KEYS: ConfigKey[] = [
-  'autoAcceptMatch',
-  'opggBuildRecommendation',
-  'opggAutoApplyRunes',
-  'smartBuildRecommendation',
-  'champSelectCounterRecommendation',
+  ...HIGH_RISK_FEATURE_SETTING_KEYS,
   'champSelectAssist',
   'analyzeTeamPower',
   'sideIndicator',
@@ -33,9 +34,7 @@ const FEATURE_KEYS: ConfigKey[] = [
 
 const CONFIG_KEYS: ConfigKey[] = [
   ...FEATURE_KEYS,
-  'autoAcceptDelayMin',
-  'autoAcceptDelayMax',
-  'opggBuildRecommendationTier',
+  ...HIGH_RISK_CONFIG_SETTING_KEYS,
   'analyzeTeamPowerMsgType',
   'analyzeTeamPowerFetchCount',
   'champSelectAssistFetchCount',
@@ -88,11 +87,23 @@ export function installCoreDebugHandles() {
   registerDebugHandle('features', () => ({
     updatedAt: Date.now(),
     flags: readConfigKeys(FEATURE_KEYS),
+    highRiskSettings: getHighRiskSettingDefinitions().map((definition) => ({
+      key: definition.key,
+      type: definition.type,
+      feature: definition.feature,
+      default: definition.default,
+    })),
   }))
 
   registerDebugHandle('config', () => ({
     updatedAt: Date.now(),
     values: readConfigKeys(CONFIG_KEYS),
+    highRiskSettings: getHighRiskSettingDefinitions().map((definition) => ({
+      key: definition.key,
+      type: definition.type,
+      feature: definition.feature,
+      default: definition.default,
+    })),
   }))
 
   registerDebugHandle('logs', (limit?: number) => ({

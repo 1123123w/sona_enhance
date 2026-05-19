@@ -1,5 +1,5 @@
 import { logger } from '@/index'
-import { store } from '@/lib/store'
+import { SETTING_KEYS, store } from '@/lib/store'
 import { lcu, LcuEventUri } from '@/lib/lcu'
 import type { LCUEventMessage, GameflowPhase } from '@/lib/lcu'
 import { DelayTask, type TaskSignal } from '@/lib/cancellable-task'
@@ -24,8 +24,8 @@ let activeAutoAcceptSignal: TaskSignal | null = null
  * 这里严格校验：哪怕是"玩家手滑输了 99999"这种也不会真睡那么久，直接秒接兜底。
  */
 function computeAcceptDelayMs(): number {
-  const minMs = store.get('autoAcceptDelayMin')
-  const maxMs = store.get('autoAcceptDelayMax')
+  const minMs = store.get(SETTING_KEYS.autoAcceptDelayMin)
+  const maxMs = store.get(SETTING_KEYS.autoAcceptDelayMax)
 
   const isValidRange =
     Number.isFinite(minMs) && Number.isFinite(maxMs) &&
