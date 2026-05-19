@@ -58,10 +58,6 @@ jobs:
           if [ -f CHANGELOG.md ]; then
             # 提取两个版本标题之间的内容
             NOTES=$(sed -n "/^## \[${TAG#v}\]/,/^## \[/{ /^## \[${TAG#v}\]/d; /^## \[/d; p; }" CHANGELOG.md)
-            if [ -z "$NOTES" ]; then
-              # 如果没有匹配到，提取第一个版本块
-              NOTES=$(sed -n '/^## \[/,/^## \[/{//!p;}' CHANGELOG.md | head -50)
-            fi
           fi
           if [ -z "$NOTES" ]; then
             NOTES="Release ${TAG}"

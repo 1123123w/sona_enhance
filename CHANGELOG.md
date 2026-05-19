@@ -5,6 +5,23 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
 ---
+## [1.3.3] - 2026-05-19
+
+### 新增
+
+- 新增统一 DevTools 诊断入口 `window.__SONAENHANCE_DEBUG__`，集中查看运行时状态、OP.GG、Counter、功能开关、关键配置和最近日志。
+- 新增 `summary()` 总览诊断方法，一条命令即可查看功能开关、选人阶段状态、OP.GG/Counter 绑定状态和最近日志。
+
+### 改进
+
+- 为自动接受、OP.GG 和 Counter 建立高风险设置元数据源，默认值由描述表生成，减少配置漂移风险。
+- 降低 OP.GG 技能预览入口轮询日志噪音，未找到入口时不再每秒刷屏。
+
+### 修复
+
+- 修复自动接受延迟期间手动拒绝后仍可能继续自动接受的问题。
+- 增强选人阶段 OP.GG 和 Counter 绑定恢复能力，降低客户端重绘后入口失效的概率。
+
 ## [1.3.2-rc.3] - 2026-05-19
 
 ### Changed
