@@ -67,6 +67,7 @@ declare global {
     features?: () => unknown
     config?: () => unknown
     logs?: (limit?: number) => unknown
+    summary?: () => unknown
     [key: string]: unknown
   }
 
